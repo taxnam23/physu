@@ -2,9 +2,18 @@
 
 from __future__ import annotations
 
-from . import units
+from . import exceptions, units
+from .exceptions import PhysicalDomainError, PhysuError
 from .units import Quantity, ureg
 
 __version__ = "0.1.0"
 
-__all__ = ["Quantity", "__version__", "units", "ureg"]
+__all__ = [
+    "PhysicalDomainError",
+    "PhysuError",
+    "Quantity",
+    "__version__",
+    "exceptions",
+    "units",
+    "ureg",
+]
