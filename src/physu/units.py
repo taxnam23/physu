@@ -76,7 +76,7 @@ def check_dimension(
         if isinstance(expected_dimension, pint.Unit)
         else expected_dimension
     )
-    if not quantity.is_compatible_with(expected):
+    if not quantity.check(expected):
         raise pint.DimensionalityError(
             quantity.units,
             expected,
