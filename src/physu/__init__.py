@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import exceptions, units, validation
+from . import constants, exceptions, units, validation
 from .exceptions import PhysicalDomainError, PhysuError
 from .units import Quantity, ureg
 
@@ -13,6 +13,7 @@ __all__ = [
     "PhysuError",
     "Quantity",
     "__version__",
+    "constants",
     "exceptions",
     "units",
     "ureg",
