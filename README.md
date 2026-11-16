@@ -82,6 +82,8 @@ except PhysicalDomainError as exc:
   - `vertical`: Free fall and vertical throw (`vertical_position`, `vertical_velocity`, `free_fall_distance`, `free_fall_speed`, `free_fall_time`, `time_to_peak`, `max_height`, `time_to_height`)
   - `projectile`: 2D projectile motion (`velocity_components`, `projectile_flight_time`, `projectile_max_height`, `projectile_range`, `projectile_position`, `projectile_velocity`)
   - `circular`: Uniform circular motion (`tangential_speed`, `angular_velocity_from_speed`, `centripetal_acceleration`, `period_from_frequency`, `frequency_from_period`, `angular_velocity_from_period`, `angular_velocity_from_frequency`, `period_from_angular_velocity`, `frequency_from_angular_velocity`, `angular_displacement`, `arc_length`)
+- **`physu.dynamics`**:
+  - `newton`: Newton's laws, weight, and inclined planes (`force`, `acceleration`, `mass`, `weight`, `inclined_parallel_force`, `inclined_normal_force`)
 
 ## Development
 
