@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypeAlias
+from typing import Any, TypeAlias, cast
 
 import pint
 
@@ -108,7 +108,17 @@ def convert_to(
     """
     target = str(target_unit)
     quantity = check_dimension(value, ureg.Unit(target), name=name)
-    return quantity.to(target)
+    return cast(pint.Quantity, quantity.to(target))
+
+
+def to_si(quantity: Any) -> pint.Quantity:
+    """Convert a ``pint.Quantity`` to clean SI base units."""
+    return cast(pint.Quantity, quantity.to_base_units())
+
+
+def to_unit(quantity: Any, target_unit: str | pint.Unit) -> pint.Quantity:
+    """Convert a ``pint.Quantity`` to ``target_unit``."""
+    return cast(pint.Quantity, quantity.to(str(target_unit)))
 
 
 __all__ = [
@@ -117,5 +127,7 @@ __all__ = [
     "check_dimension",
     "convert_to",
     "to_quantity",
+    "to_si",
+    "to_unit",
     "ureg",
 ]

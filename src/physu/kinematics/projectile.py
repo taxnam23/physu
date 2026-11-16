@@ -8,7 +8,7 @@ import pint
 
 from ..constants import STANDARD_GRAVITY
 from ..exceptions import PhysicalDomainError
-from ..units import Quantity, QuantityLike
+from ..units import Quantity, QuantityLike, to_si
 from ..validation import validate_quantity
 from . import uniform, vertical
 
@@ -153,7 +153,7 @@ def projectile_max_height(
             raise PhysicalDomainError(
                 "Cannot launch downward (vy0 < 0) from ground level (initial_height == 0)."
             )
-        return y0.to_base_units()
+        return to_si(y0)
 
     return vertical.max_height(vy0, initial_height=y0, gravity=g)
 

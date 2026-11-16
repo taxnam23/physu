@@ -7,7 +7,7 @@ import math
 import pint
 
 from ..exceptions import PhysicalDomainError
-from ..units import Quantity, QuantityLike
+from ..units import Quantity, QuantityLike, to_unit
 from ..validation import validate_quantity
 
 
@@ -105,11 +105,11 @@ def centripetal_acceleration(
     r = _validate_positive_radius(radius)
     if tangential_speed is not None:
         v = validate_quantity(tangential_speed, "[velocity]", name="tangential_speed")
-        return (v**2 / r).to("m / s^2")
+        return to_unit(v**2 / r, "m / s^2")
 
     assert angular_velocity is not None
     omega = validate_quantity(angular_velocity, "rad / s", name="angular_velocity")
-    return (omega**2 * r).to("m / s^2")
+    return to_unit(omega**2 * r, "m / s^2")
 
 
 def period_from_frequency(frequency: QuantityLike) -> pint.Quantity:
@@ -213,14 +213,14 @@ def angular_displacement(
     """Compute angular displacement in UCM: ``dtheta = omega * t``."""
     omega = validate_quantity(angular_velocity, "rad / s", name="angular_velocity")
     elapsed = validate_quantity(time, "[time]", name="time", allow_negative=False)
-    return (omega * elapsed).to("rad")
+    return to_unit(omega * elapsed, "rad")
 
 
 def arc_length(radius: QuantityLike, angle: QuantityLike) -> pint.Quantity:
     """Compute circular arc length: ``s = r * theta``."""
     r = validate_quantity(radius, "[length]", name="radius", allow_negative=False)
     theta = validate_quantity(angle, "rad", name="angle")
-    return (r * theta).to("m")
+    return to_unit(r * theta, "m")
 
 
 __all__ = [

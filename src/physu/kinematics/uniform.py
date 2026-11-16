@@ -5,7 +5,7 @@ from __future__ import annotations
 import pint
 
 from ..exceptions import PhysicalDomainError
-from ..units import QuantityLike
+from ..units import QuantityLike, to_si
 from ..validation import validate_quantity
 
 
@@ -25,7 +25,7 @@ def displacement(velocity: QuantityLike, time: QuantityLike) -> pint.Quantity:
     """
     vel = validate_quantity(velocity, "[velocity]", name="velocity")
     elapsed = validate_quantity(time, "[time]", name="time", allow_negative=False)
-    return (vel * elapsed).to_base_units()
+    return to_si(vel * elapsed)
 
 
 def position(
@@ -49,7 +49,7 @@ def position(
     """
     x0 = validate_quantity(initial_position, "[length]", name="initial_position")
     delta_x = displacement(velocity, time)
-    return (x0 + delta_x).to_base_units()
+    return to_si(x0 + delta_x)
 
 
 def average_velocity(displacement: QuantityLike, time: QuantityLike) -> pint.Quantity:
@@ -74,7 +74,7 @@ def average_velocity(displacement: QuantityLike, time: QuantityLike) -> pint.Qua
         allow_negative=False,
         allow_zero=False,
     )
-    return (delta_x / elapsed).to_base_units()
+    return to_si(delta_x / elapsed)
 
 
 def travel_time(displacement: QuantityLike, velocity: QuantityLike) -> pint.Quantity:
@@ -94,7 +94,7 @@ def travel_time(displacement: QuantityLike, velocity: QuantityLike) -> pint.Quan
     """
     delta_x = validate_quantity(displacement, "[length]", name="displacement")
     vel = validate_quantity(velocity, "[velocity]", name="velocity", allow_zero=False)
-    elapsed = (delta_x / vel).to_base_units()
+    elapsed = to_si(delta_x / vel)
     if elapsed.magnitude < 0:
         raise PhysicalDomainError(
             "Displacement and velocity have opposite signs, yielding a non-physical "

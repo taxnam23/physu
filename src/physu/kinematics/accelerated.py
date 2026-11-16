@@ -7,7 +7,7 @@ import math
 import pint
 
 from ..exceptions import PhysicalDomainError
-from ..units import Quantity, QuantityLike
+from ..units import Quantity, QuantityLike, to_si
 from ..validation import validate_quantity
 
 _ZERO_TOLERANCE = 1e-12
@@ -35,7 +35,7 @@ def final_velocity(
     v0 = validate_quantity(initial_velocity, "[velocity]", name="initial_velocity")
     acc = validate_quantity(acceleration, "[acceleration]", name="acceleration")
     elapsed = validate_quantity(time, "[time]", name="time", allow_negative=False)
-    return (v0 + acc * elapsed).to_base_units()
+    return to_si(v0 + acc * elapsed)
 
 
 def displacement(
@@ -60,7 +60,7 @@ def displacement(
     v0 = validate_quantity(initial_velocity, "[velocity]", name="initial_velocity")
     acc = validate_quantity(acceleration, "[acceleration]", name="acceleration")
     elapsed = validate_quantity(time, "[time]", name="time", allow_negative=False)
-    return (v0 * elapsed + 0.5 * acc * elapsed**2).to_base_units()
+    return to_si(v0 * elapsed + 0.5 * acc * elapsed**2)
 
 
 def position(
@@ -86,7 +86,7 @@ def position(
     """
     x0 = validate_quantity(initial_position, "[length]", name="initial_position")
     delta_x = displacement(initial_velocity, acceleration, time)
-    return (x0 + delta_x).to_base_units()
+    return to_si(x0 + delta_x)
 
 
 def displacement_from_velocities(
@@ -111,7 +111,7 @@ def displacement_from_velocities(
     v0 = validate_quantity(initial_velocity, "[velocity]", name="initial_velocity")
     vf = validate_quantity(final_velocity, "[velocity]", name="final_velocity")
     elapsed = validate_quantity(time, "[time]", name="time", allow_negative=False)
-    return (0.5 * (v0 + vf) * elapsed).to_base_units()
+    return to_si(0.5 * (v0 + vf) * elapsed)
 
 
 def acceleration(
@@ -142,7 +142,7 @@ def acceleration(
         allow_negative=False,
         allow_zero=False,
     )
-    return ((vf - v0) / elapsed).to_base_units()
+    return to_si((vf - v0) / elapsed)
 
 
 def torricelli_velocity(
@@ -209,7 +209,7 @@ def time_to_velocity(
         name="acceleration",
         allow_zero=False,
     )
-    elapsed = ((vf - v0) / acc).to_base_units()
+    elapsed = to_si((vf - v0) / acc)
     if elapsed.magnitude < 0:
         raise PhysicalDomainError(
             "Target velocity cannot be reached at non-negative time with the given "
@@ -238,9 +238,21 @@ def time_to_displacement(
         PhysicalDomainError: If the displacement is unreachable, indeterminate
             (``v0 == 0``, ``a == 0``, ``dx == 0``), or only occurs for ``t < 0``.
     """
-    v0 = float(validate_quantity(initial_velocity, "[velocity]", name="initial_velocity").to("m / s").magnitude)
-    acc = float(validate_quantity(acceleration, "[acceleration]", name="acceleration").to("m / s^2").magnitude)
-    dx = float(validate_quantity(displacement, "[length]", name="displacement").to("m").magnitude)
+    v0 = float(
+        validate_quantity(initial_velocity, "[velocity]", name="initial_velocity")
+        .to("m / s")
+        .magnitude
+    )
+    acc = float(
+        validate_quantity(acceleration, "[acceleration]", name="acceleration")
+        .to("m / s^2")
+        .magnitude
+    )
+    dx = float(
+        validate_quantity(displacement, "[length]", name="displacement")
+        .to("m")
+        .magnitude
+    )
 
     if math.isclose(acc, 0.0, abs_tol=_ZERO_TOLERANCE):
         if math.isclose(v0, 0.0, abs_tol=_ZERO_TOLERANCE):
@@ -274,7 +286,10 @@ def time_to_displacement(
     for root in sorted(raw_roots):
         if root >= -_ZERO_TOLERANCE:
             snapped = 0.0 if root < 0.0 else root
-            if not any(math.isclose(snapped, existing, abs_tol=_ZERO_TOLERANCE) for existing in valid_roots):
+            if not any(
+                math.isclose(snapped, existing, abs_tol=_ZERO_TOLERANCE)
+                for existing in valid_roots
+            ):
                 valid_roots.append(snapped)
 
     if not valid_roots:

@@ -7,7 +7,7 @@ import math
 import pint
 
 from ..constants import STANDARD_GRAVITY
-from ..units import Quantity, QuantityLike
+from ..units import Quantity, QuantityLike, to_si
 from ..validation import validate_quantity
 from . import accelerated
 
@@ -152,7 +152,7 @@ def time_to_peak(
         allow_negative=False,
     )
     g = _validate_gravity(gravity)
-    return (v0 / g).to_base_units()
+    return to_si(v0 / g)
 
 
 def max_height(
@@ -180,7 +180,7 @@ def max_height(
         allow_negative=False,
     )
     g = _validate_gravity(gravity)
-    return (y0 + v0**2 / (2.0 * g)).to_base_units()
+    return to_si(y0 + v0**2 / (2.0 * g))
 
 
 def time_to_height(
