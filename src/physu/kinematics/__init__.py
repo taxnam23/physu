@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import accelerated, uniform
+from . import accelerated, uniform, vertical
 from .accelerated import (
     acceleration,
     displacement_from_velocities,
@@ -14,6 +14,16 @@ from .accelerated import (
 from .accelerated import displacement as accelerated_displacement
 from .accelerated import position as accelerated_position
 from .uniform import average_velocity, displacement, position, travel_time
+from .vertical import (
+    free_fall_distance,
+    free_fall_speed,
+    free_fall_time,
+    max_height,
+    time_to_height,
+    time_to_peak,
+    vertical_position,
+    vertical_velocity,
+)
 
 __all__ = [
     "accelerated",
@@ -24,10 +34,19 @@ __all__ = [
     "displacement",
     "displacement_from_velocities",
     "final_velocity",
+    "free_fall_distance",
+    "free_fall_speed",
+    "free_fall_time",
+    "max_height",
     "position",
     "time_to_displacement",
+    "time_to_height",
+    "time_to_peak",
     "time_to_velocity",
     "torricelli_velocity",
     "travel_time",
     "uniform",
+    "vertical",
+    "vertical_position",
+    "vertical_velocity",
 ]
