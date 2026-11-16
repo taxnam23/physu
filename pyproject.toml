@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "physu"
-version = "0.1.0"
+version = "0.2.0"
 description = "A modular Python physics library with strict unit and dimensional validation powered by Pint."
 readme = "README.md"
 license = "MIT"
@@ -19,6 +19,7 @@ keywords = [
     "pint",
     "dimensional-analysis",
     "kinematics",
+    "dynamics",
     "scientific-computing",
 ]
 classifiers = [

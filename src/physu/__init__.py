@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from . import constants, exceptions, kinematics, units, validation
+from . import constants, dynamics, exceptions, kinematics, units, validation
 from .exceptions import PhysicalDomainError, PhysuError
 from .units import Quantity, ureg
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "PhysicalDomainError",
@@ -14,6 +14,7 @@ __all__ = [
     "Quantity",
     "__version__",
     "constants",
+    "dynamics",
     "exceptions",
     "kinematics",
     "units",
