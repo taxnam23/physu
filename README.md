@@ -87,6 +87,7 @@ except PhysicalDomainError as exc:
   - `friction`: Static and kinetic friction (`max_static_friction`, `kinetic_friction`, `friction_coefficient`, `normal_force`, `critical_incline_angle`)
   - `elasticity`: Hooke's law and springs (`spring_force`, `spring_force_magnitude`, `spring_constant`, `spring_displacement`, `series_spring_constant`, `parallel_spring_constant`)
   - `momentum`: Linear momentum, impulse, and 1D collisions (`linear_momentum`, `impulse`, `momentum_change`, `average_force`, `collision_velocities`, `elastic_collision_velocities`, `inelastic_collision_velocity`)
+  - `gravitation`: Universal gravitation and circular dynamics (`gravitational_force`, `gravitational_field_strength`, `orbital_speed`, `centripetal_force`)
 
 ## Development
 

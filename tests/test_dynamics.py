@@ -6,14 +6,18 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError, ureg
+from physu.constants import GRAVITATIONAL_CONSTANT
 from physu.dynamics import (
     acceleration,
     average_force,
+    centripetal_force,
     collision_velocities,
     critical_incline_angle,
     elastic_collision_velocities,
     force,
     friction_coefficient,
+    gravitational_field_strength,
+    gravitational_force,
     impulse,
     inclined_normal_force,
     inclined_parallel_force,
@@ -24,6 +28,7 @@ from physu.dynamics import (
     max_static_friction,
     momentum_change,
     normal_force,
+    orbital_speed,
     parallel_spring_constant,
     series_spring_constant,
     spring_constant,
@@ -256,3 +261,50 @@ def test_momentum_validation_errors() -> None:
         collision_velocities("1 kg", "5 m/s", "1 kg", "0 m/s", restitution=1.2)
     with pytest.raises(PhysicalDomainError):
         collision_velocities("1 kg", "5 m/s", "1 kg", "0 m/s", restitution=-0.1)
+
+
+def test_gravitation_and_circular_dynamics() -> None:
+    f_g = gravitational_force("1e6 kg", "2e6 kg", "2 m")
+    expected_f = GRAVITATIONAL_CONSTANT.magnitude * 1e6 * 2e6 / 4.0
+    assert str(f_g.units) == "newton"
+    assert f_g.magnitude == pytest.approx(expected_f)
+
+    g_earth = gravitational_field_strength("5.9722e24 kg", "6371 km")
+    assert g_earth.to("m/s^2").magnitude == pytest.approx(9.82, rel=1e-2)
+
+    v_orb = orbital_speed("1e4 kg", "1 m", gravitational_constant="1 m^3 / (kg * s^2)")
+    assert v_orb.to("m/s").magnitude == pytest.approx(100.0)
+
+    fc_v = centripetal_force("2 kg", "4 m", tangential_speed="6 m/s")
+    assert fc_v.to("N").magnitude == pytest.approx(18.0)
+
+    fc_w = centripetal_force("2 kg", "2 m", angular_velocity="60 rpm")
+    # omega = 2*pi rad/s => Fc = 2 * (2*pi)^2 * 2 = 16*pi^2 N
+    assert fc_w.to("N").magnitude == pytest.approx(157.91367041742973, rel=1e-9)
+
+
+def test_gravitation_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        gravitational_force("10 kg", "10 kg", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        orbital_speed("1e24 kg", "10 m", gravitational_constant="10 N")
+    with pytest.raises(pint.DimensionalityError):
+        centripetal_force("2 kg", "4 m", angular_velocity="3 m/s")
+
+    with pytest.raises(ValueError):
+        centripetal_force("2 kg", "4 m")
+    with pytest.raises(ValueError):
+        centripetal_force("2 kg", "4 m", tangential_speed="3 m/s", angular_velocity="1 rad/s")
+
+    with pytest.raises(PhysicalDomainError):
+        gravitational_force("-1 kg", "2 kg", "1 m")
+    with pytest.raises(PhysicalDomainError):
+        gravitational_field_strength("10 kg", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        orbital_speed("10 kg", "-5 m")
+    with pytest.raises(PhysicalDomainError):
+        orbital_speed("10 kg", "5 m", gravitational_constant="0 m^3 / (kg * s^2)")
+    with pytest.raises(PhysicalDomainError):
+        centripetal_force("-2 kg", "4 m", tangential_speed="6 m/s")
+    with pytest.raises(PhysicalDomainError):
+        centripetal_force("2 kg", "0 m", tangential_speed="6 m/s")
