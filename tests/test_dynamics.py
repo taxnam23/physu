@@ -17,6 +17,12 @@ from physu.dynamics import (
     mass,
     max_static_friction,
     normal_force,
+    parallel_spring_constant,
+    series_spring_constant,
+    spring_constant,
+    spring_displacement,
+    spring_force,
+    spring_force_magnitude,
     weight,
 )
 
@@ -115,3 +121,68 @@ def test_friction_validation_errors() -> None:
         friction_coefficient("-5 N", "50 N")
     with pytest.raises(PhysicalDomainError):
         critical_incline_angle(-0.5)
+
+
+def test_elasticity_calculations_and_conversions() -> None:
+    f_restoring = spring_force("200 N/m", "15 cm")
+    assert str(f_restoring.units) == "newton"
+    assert f_restoring.magnitude == pytest.approx(-30.0)
+
+    f_zero = spring_force("200 N/m", "0 m")
+    assert f_zero.magnitude == 0.0
+    assert str(f_zero.magnitude) == "0.0"
+
+    f_mag = spring_force_magnitude("2 kN/m", "-5 cm")
+    assert f_mag.to("N").magnitude == pytest.approx(100.0)
+
+    k_from_restoring = spring_constant("-30 N", "15 cm")
+    assert str(k_from_restoring.units) == "newton / meter"
+    assert k_from_restoring.magnitude == pytest.approx(200.0)
+
+    k_from_applied = spring_constant("30 N", "15 cm")
+    assert k_from_applied.to("N / m").magnitude == pytest.approx(200.0)
+
+    dx = spring_displacement("-30 N", "200 N/m")
+    assert dx.to("cm").magnitude == pytest.approx(15.0)
+    assert spring_displacement("0 N", "200 N/m").magnitude == 0.0
+
+    k_series = series_spring_constant(["100 N/m", "200 N/m", "2 N/cm"])
+    assert k_series.to("N / m").magnitude == pytest.approx(50.0)
+
+    k_parallel = parallel_spring_constant(["100 N/m", "1 N/cm", "0.3 kN/m"])
+    assert k_parallel.to("N / m").magnitude == pytest.approx(500.0)
+
+
+def test_elasticity_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        spring_force("200 N", "0.1 m")
+    with pytest.raises(pint.DimensionalityError):
+        spring_force("200 N/m", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        spring_constant("10 kg", "0.2 m")
+    with pytest.raises(pint.DimensionalityError):
+        series_spring_constant(["100 N/m", "50 N"])
+
+    with pytest.raises(TypeError):
+        series_spring_constant("100 N/m")  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        parallel_spring_constant("100 N/m")  # type: ignore[arg-type]
+
+    with pytest.raises(PhysicalDomainError):
+        spring_force("-10 N/m", "0.1 m")
+    with pytest.raises(PhysicalDomainError):
+        spring_force_magnitude("-10 N/m", "0.1 m")
+    with pytest.raises(PhysicalDomainError):
+        spring_constant("10 N", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        spring_displacement("10 N", "0 N/m")
+    with pytest.raises(PhysicalDomainError):
+        spring_displacement("10 N", "-50 N/m")
+    with pytest.raises(PhysicalDomainError):
+        series_spring_constant([])
+    with pytest.raises(PhysicalDomainError):
+        series_spring_constant(["100 N/m", "0 N/m"])
+    with pytest.raises(PhysicalDomainError):
+        parallel_spring_constant([])
+    with pytest.raises(PhysicalDomainError):
+        parallel_spring_constant(["100 N/m", "-20 N/m"])

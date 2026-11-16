@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from . import friction, newton
+from . import elasticity, friction, newton
+from .elasticity import (
+    parallel_spring_constant,
+    series_spring_constant,
+    spring_constant,
+    spring_displacement,
+    spring_force,
+    spring_force_magnitude,
+)
 from .friction import (
     critical_incline_angle,
     friction_coefficient,
@@ -22,6 +30,7 @@ from .newton import (
 __all__ = [
     "acceleration",
     "critical_incline_angle",
+    "elasticity",
     "force",
     "friction",
     "friction_coefficient",
@@ -32,5 +41,11 @@ __all__ = [
     "max_static_friction",
     "newton",
     "normal_force",
+    "parallel_spring_constant",
+    "series_spring_constant",
+    "spring_constant",
+    "spring_displacement",
+    "spring_force",
+    "spring_force_magnitude",
     "weight",
 ]
