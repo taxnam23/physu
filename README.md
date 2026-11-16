@@ -84,6 +84,7 @@ except PhysicalDomainError as exc:
   - `circular`: Uniform circular motion (`tangential_speed`, `angular_velocity_from_speed`, `centripetal_acceleration`, `period_from_frequency`, `frequency_from_period`, `angular_velocity_from_period`, `angular_velocity_from_frequency`, `period_from_angular_velocity`, `frequency_from_angular_velocity`, `angular_displacement`, `arc_length`)
 - **`physu.dynamics`**:
   - `newton`: Newton's laws, weight, and inclined planes (`force`, `acceleration`, `mass`, `weight`, `inclined_parallel_force`, `inclined_normal_force`)
+  - `friction`: Static and kinetic friction (`max_static_friction`, `kinetic_friction`, `friction_coefficient`, `normal_force`, `critical_incline_angle`)
 
 ## Development
 

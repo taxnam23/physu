@@ -8,10 +8,15 @@ import pytest
 from physu import PhysicalDomainError, ureg
 from physu.dynamics import (
     acceleration,
+    critical_incline_angle,
     force,
+    friction_coefficient,
     inclined_normal_force,
     inclined_parallel_force,
+    kinetic_friction,
     mass,
+    max_static_friction,
+    normal_force,
     weight,
 )
 
@@ -68,3 +73,45 @@ def test_newton_validation_errors() -> None:
         inclined_normal_force("10 kg", "-10 deg")
     with pytest.raises(PhysicalDomainError):
         inclined_normal_force("10 kg", "100 deg")
+
+
+def test_friction_calculations_and_conversions() -> None:
+    fs_max = max_static_friction(0.5, "100 N")
+    assert str(fs_max.units) == "newton"
+    assert fs_max.magnitude == pytest.approx(50.0)
+
+    fk = kinetic_friction(0.3, "200 N")
+    assert fk.to("N").magnitude == pytest.approx(60.0)
+
+    mu = friction_coefficient("30 N", "150 N")
+    assert mu.dimensionless
+    assert mu.magnitude == pytest.approx(0.2)
+
+    n_flat = normal_force("10 kg", gravity="10 m/s^2")
+    assert n_flat.to("N").magnitude == pytest.approx(100.0)
+
+    n_incline = normal_force("10 kg", angle="60 deg", gravity="10 m/s^2")
+    assert n_incline.to("N").magnitude == pytest.approx(50.0)
+
+    theta_c = critical_incline_angle(1.0)
+    assert theta_c.to("deg").magnitude == pytest.approx(45.0)
+
+
+def test_friction_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        max_static_friction("0.4 m", "100 N")
+    with pytest.raises(pint.DimensionalityError):
+        kinetic_friction(0.3, "10 kg")
+    with pytest.raises(pint.DimensionalityError):
+        critical_incline_angle("1 s")
+
+    with pytest.raises(PhysicalDomainError):
+        max_static_friction(-0.1, "100 N")
+    with pytest.raises(PhysicalDomainError):
+        kinetic_friction(0.3, "-10 N")
+    with pytest.raises(PhysicalDomainError):
+        friction_coefficient("10 N", "0 N")
+    with pytest.raises(PhysicalDomainError):
+        friction_coefficient("-5 N", "50 N")
+    with pytest.raises(PhysicalDomainError):
+        critical_incline_angle(-0.5)
