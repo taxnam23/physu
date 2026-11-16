@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import accelerated, uniform, vertical
+from . import accelerated, projectile, uniform, vertical
 from .accelerated import (
     acceleration,
     displacement_from_velocities,
@@ -13,6 +13,14 @@ from .accelerated import (
 )
 from .accelerated import displacement as accelerated_displacement
 from .accelerated import position as accelerated_position
+from .projectile import (
+    projectile_flight_time,
+    projectile_max_height,
+    projectile_position,
+    projectile_range,
+    projectile_velocity,
+    velocity_components,
+)
 from .uniform import average_velocity, displacement, position, travel_time
 from .vertical import (
     free_fall_distance,
@@ -39,6 +47,12 @@ __all__ = [
     "free_fall_time",
     "max_height",
     "position",
+    "projectile",
+    "projectile_flight_time",
+    "projectile_max_height",
+    "projectile_position",
+    "projectile_range",
+    "projectile_velocity",
     "time_to_displacement",
     "time_to_height",
     "time_to_peak",
@@ -46,6 +60,7 @@ __all__ = [
     "torricelli_velocity",
     "travel_time",
     "uniform",
+    "velocity_components",
     "vertical",
     "vertical_position",
     "vertical_velocity",
