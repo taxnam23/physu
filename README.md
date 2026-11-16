@@ -23,52 +23,15 @@ pip install -e ".[dev]"
 
 Requires Python `>= 3.10`.
 
-## Quickstart
+## Examples
 
-```python
-import pint
-from physu import PhysicalDomainError, ureg
-from physu.constants import STANDARD_GRAVITY
-from physu.kinematics import (
-    accelerated_displacement,
-    centripetal_acceleration,
-    displacement,
-    projectile_range,
-    time_to_height,
-)
+Runnable scripts covering every module and submodule live in [examples/](examples/):
 
-# 1D Uniform Motion (MRU)
-dx = displacement("72 km/h", "10 s")
-print(dx)            # 200.0 meter
-print(dx.to("km"))   # 0.2 kilometer
-
-# 1D Uniformly Accelerated Motion (MRUA)
-dx_acc = accelerated_displacement(10 * (ureg.m / ureg.s), "2 m/s^2", "5 s")
-print(dx_acc)        # 75.0 meter
-
-# Vertical Motion (returns both times when reaching 15 m: going up & coming down)
-times = time_to_height("20 m/s", "15 m", gravity="10 m/s^2")
-print(times)         # (Quantity(1.0, "second"), Quantity(3.0, "second"))
-
-# 2D Projectile Motion
-rng = projectile_range("20 m/s", "45 deg", gravity=STANDARD_GRAVITY)
-print(round(rng, 2)) # 40.79 meter
-
-# Uniform Circular Motion (UCM)
-ac = centripetal_acceleration("2 m", angular_velocity="60 rpm")
-print(round(ac, 2))  # 78.96 meter / second ** 2
-
-# Catching dimensional & physical errors
-try:
-    displacement("10 kg", "2 s")
-except pint.DimensionalityError as exc:
-    print("Dimension error:", exc)
-
-try:
-    time_to_height("20 m/s", "25 m", gravity="10 m/s^2")
-except PhysicalDomainError as exc:
-    print("Domain error:", exc)
-```
+- [units_and_validation.py](examples/units_and_validation.py) — units, constants, validation helpers, and error handling
+- [kinematics_1d.py](examples/kinematics_1d.py) — uniform, accelerated (MRUA/SUVAT), and vertical motion
+- [kinematics_2d_and_circular.py](examples/kinematics_2d_and_circular.py) — 2D projectile and uniform circular motion
+- [dynamics_forces_and_friction.py](examples/dynamics_forces_and_friction.py) — Newton's laws, inclined planes, and friction
+- [dynamics_elasticity_momentum_gravitation.py](examples/dynamics_elasticity_momentum_gravitation.py) — Hooke's law, momentum/collisions, and gravitation
 
 ## Modules
 
