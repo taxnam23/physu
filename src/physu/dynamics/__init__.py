@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import elasticity, friction, newton
+from . import elasticity, friction, momentum, newton
 from .elasticity import (
     parallel_spring_constant,
     series_spring_constant,
@@ -18,6 +18,15 @@ from .friction import (
     max_static_friction,
     normal_force,
 )
+from .momentum import (
+    average_force,
+    collision_velocities,
+    elastic_collision_velocities,
+    impulse,
+    inelastic_collision_velocity,
+    linear_momentum,
+    momentum_change,
+)
 from .newton import (
     acceleration,
     force,
@@ -29,16 +38,24 @@ from .newton import (
 
 __all__ = [
     "acceleration",
+    "average_force",
+    "collision_velocities",
     "critical_incline_angle",
+    "elastic_collision_velocities",
     "elasticity",
     "force",
     "friction",
     "friction_coefficient",
+    "impulse",
     "inclined_normal_force",
     "inclined_parallel_force",
+    "inelastic_collision_velocity",
     "kinetic_friction",
+    "linear_momentum",
     "mass",
     "max_static_friction",
+    "momentum",
+    "momentum_change",
     "newton",
     "normal_force",
     "parallel_spring_constant",

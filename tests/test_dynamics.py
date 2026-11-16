@@ -8,14 +8,21 @@ import pytest
 from physu import PhysicalDomainError, ureg
 from physu.dynamics import (
     acceleration,
+    average_force,
+    collision_velocities,
     critical_incline_angle,
+    elastic_collision_velocities,
     force,
     friction_coefficient,
+    impulse,
     inclined_normal_force,
     inclined_parallel_force,
+    inelastic_collision_velocity,
     kinetic_friction,
+    linear_momentum,
     mass,
     max_static_friction,
+    momentum_change,
     normal_force,
     parallel_spring_constant,
     series_spring_constant,
@@ -186,3 +193,66 @@ def test_elasticity_validation_errors() -> None:
         parallel_spring_constant([])
     with pytest.raises(PhysicalDomainError):
         parallel_spring_constant(["100 N/m", "-20 N/m"])
+
+
+def test_momentum_and_impulse_calculations() -> None:
+    p = linear_momentum("2000 g", "72 km/h")
+    assert p.to("kg * m / s").magnitude == pytest.approx(40.0)
+    assert p.to("N * s").magnitude == pytest.approx(40.0)
+
+    j = impulse("50 N", "400 ms")
+    assert j.to("N * s").magnitude == pytest.approx(20.0)
+
+    dp = momentum_change("2 kg", "-3 m/s", "5 m/s")
+    assert dp.to("kg * m / s").magnitude == pytest.approx(16.0)
+
+    f_avg = average_force("20 N * s", "0.5 s")
+    assert str(f_avg.units) == "newton"
+    assert f_avg.magnitude == pytest.approx(40.0)
+
+
+def test_one_dimensional_collisions() -> None:
+    # Equal-mass elastic collision swaps velocities
+    v1_eq, v2_eq = elastic_collision_velocities("2 kg", "5 m/s", "2000 g", "-1 m/s")
+    assert v1_eq.to("m/s").magnitude == pytest.approx(-1.0)
+    assert v2_eq.to("m/s").magnitude == pytest.approx(5.0)
+
+    # Unequal masses: v1' = ((1 - 3)*4 + 2*3*0)/4 = -2 m/s, v2' = (2*1*4)/4 = 2 m/s
+    v1_el, v2_el = elastic_collision_velocities("1 kg", "4 m/s", "3 kg", "0 m/s")
+    assert v1_el.to("m/s").magnitude == pytest.approx(-2.0)
+    assert v2_el.to("m/s").magnitude == pytest.approx(2.0)
+
+    # Perfectly inelastic collision
+    v_inel = inelastic_collision_velocity("2 kg", "6 m/s", "4 kg", "-3 m/s")
+    assert v_inel.to("m/s").magnitude == pytest.approx(0.0)
+
+    # Partial restitution (e = 0.5): e*(v1 - v2) = 0.5*(6 - 0) = 3 -> v2' - v1' = 3
+    v1_part, v2_part = collision_velocities("2 kg", "6 m/s", "2 kg", "0 m/s", restitution=0.5)
+    assert v1_part.to("m/s").magnitude == pytest.approx(1.5)
+    assert v2_part.to("m/s").magnitude == pytest.approx(4.5)
+
+
+def test_momentum_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        linear_momentum("2 m", "5 m/s")
+    with pytest.raises(pint.DimensionalityError):
+        average_force("10 N", "1 s")
+    with pytest.raises(pint.DimensionalityError):
+        elastic_collision_velocities("1 kg", "2 m", "1 kg", "0 m/s")
+    with pytest.raises(pint.DimensionalityError):
+        collision_velocities("1 kg", "2 m/s", "1 kg", "0 m/s", restitution="0.5 m")
+
+    with pytest.raises(PhysicalDomainError):
+        linear_momentum("-1 kg", "5 m/s")
+    with pytest.raises(PhysicalDomainError):
+        impulse("10 N", "-1 s")
+    with pytest.raises(PhysicalDomainError):
+        average_force("10 N * s", "0 s")
+    with pytest.raises(PhysicalDomainError):
+        elastic_collision_velocities("0 kg", "5 m/s", "1 kg", "0 m/s")
+    with pytest.raises(PhysicalDomainError):
+        inelastic_collision_velocity("1 kg", "5 m/s", "-2 kg", "0 m/s")
+    with pytest.raises(PhysicalDomainError):
+        collision_velocities("1 kg", "5 m/s", "1 kg", "0 m/s", restitution=1.2)
+    with pytest.raises(PhysicalDomainError):
+        collision_velocities("1 kg", "5 m/s", "1 kg", "0 m/s", restitution=-0.1)
