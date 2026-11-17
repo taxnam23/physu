@@ -9,7 +9,7 @@ import math
 
 import pint
 
-from .units import Quantity
+from .units import Quantity, to_unit
 
 # Mechanics & gravitation
 STANDARD_GRAVITY: pint.Quantity = Quantity(9.80665, "m / s^2")
@@ -33,6 +33,11 @@ BOLTZMANN_CONSTANT: pint.Quantity = Quantity(1.380649e-23, "J / K")
 AVOGADRO_CONSTANT: pint.Quantity = Quantity(6.02214076e23, "1 / mol")
 MOLAR_GAS_CONSTANT: pint.Quantity = AVOGADRO_CONSTANT * BOLTZMANN_CONSTANT
 STANDARD_ATMOSPHERE: pint.Quantity = Quantity(101_325, "Pa")
+STEFAN_BOLTZMANN_CONSTANT: pint.Quantity = to_unit(
+    (2.0 * (math.pi**5) * (BOLTZMANN_CONSTANT**4))
+    / (15.0 * (PLANCK_CONSTANT**3) * (SPEED_OF_LIGHT**2)),
+    "W / (m^2 * K^4)",
+)
 
 # Atomic & particle masses
 ELECTRON_MASS: pint.Quantity = Quantity(9.1093837139e-31, "kg")
@@ -51,6 +56,7 @@ __all__ = [
     "SPEED_OF_LIGHT",
     "STANDARD_ATMOSPHERE",
     "STANDARD_GRAVITY",
+    "STEFAN_BOLTZMANN_CONSTANT",
     "VACUUM_PERMEABILITY",
     "VACUUM_PERMITTIVITY",
 ]

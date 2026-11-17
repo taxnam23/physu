@@ -39,7 +39,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - **`physu.units`**: Centralized `ureg`, `Quantity`, `to_quantity`, `check_dimension`, `convert_to`, `to_si`, and `to_unit`.
 - **`physu.exceptions`**: `PhysuError` and `PhysicalDomainError`.
 - **`physu.validation`**: `validate_quantity`, `require_non_negative`, `require_positive`, `require_non_zero`, and `require_range`.
-- **`physu.constants`**: Fundamental SI / CODATA 2022 constants (`STANDARD_GRAVITY`, `SPEED_OF_LIGHT`, `GRAVITATIONAL_CONSTANT`, `PLANCK_CONSTANT`, `ELEMENTARY_CHARGE`, `BOLTZMANN_CONSTANT`, `AVOGADRO_CONSTANT`, `MOLAR_GAS_CONSTANT`, `STANDARD_ATMOSPHERE`, `ELECTRON_MASS`, `PROTON_MASS`, `VACUUM_PERMITTIVITY`, `VACUUM_PERMEABILITY`).
+- **`physu.constants`**: Fundamental SI / CODATA 2022 constants (`STANDARD_GRAVITY`, `SPEED_OF_LIGHT`, `GRAVITATIONAL_CONSTANT`, `PLANCK_CONSTANT`, `ELEMENTARY_CHARGE`, `BOLTZMANN_CONSTANT`, `AVOGADRO_CONSTANT`, `MOLAR_GAS_CONSTANT`, `STANDARD_ATMOSPHERE`, `STEFAN_BOLTZMANN_CONSTANT`, `ELECTRON_MASS`, `PROTON_MASS`, `VACUUM_PERMITTIVITY`, `VACUUM_PERMEABILITY`).
 - **`physu.kinematics`**:
   - `uniform`: MRU (`displacement`, `position`, `average_velocity`, `travel_time`)
   - `accelerated`: MRUA / SUVAT (`final_velocity`, `displacement`, `position`, `displacement_from_velocities`, `acceleration`, `torricelli_velocity`, `time_to_velocity`, `time_to_displacement`)
@@ -63,6 +63,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `calorimetry`: Sensible heat, latent heat, and thermal equilibrium (`sensible_heat`, `latent_heat`, `specific_heat_capacity`, `equilibrium_temperature`)
   - `ideal_gas`: Ideal gas law and kinetic theory (`ideal_gas_pressure`, `ideal_gas_volume`, `ideal_gas_moles`, `ideal_gas_temperature`, `combined_gas_law`, `rms_molecular_speed`, `average_molecular_kinetic_energy`)
   - `laws`: First/second laws, process work, and engines (`internal_energy_change`, `isobaric_work`, `isothermal_work`, `thermal_efficiency`, `carnot_efficiency`, `isothermal_entropy_change`)
+  - `heat_transfer`: Conduction and thermal radiation (`conduction_heat_rate`, `radiation_power`)
 
 ## Development
 

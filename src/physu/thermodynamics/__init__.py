@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-from . import calorimetry, ideal_gas, laws, temperature
+from . import calorimetry, heat_transfer, ideal_gas, laws, temperature
 from .calorimetry import (
     equilibrium_temperature,
     latent_heat,
     sensible_heat,
     specific_heat_capacity,
+)
+from .heat_transfer import (
+    conduction_heat_rate,
+    radiation_power,
 )
 from .ideal_gas import (
     average_molecular_kinetic_energy,
@@ -40,7 +44,9 @@ __all__ = [
     "calorimetry",
     "carnot_efficiency",
     "combined_gas_law",
+    "conduction_heat_rate",
     "equilibrium_temperature",
+    "heat_transfer",
     "ideal_gas",
     "ideal_gas_moles",
     "ideal_gas_pressure",
@@ -53,6 +59,7 @@ __all__ = [
     "latent_heat",
     "laws",
     "linear_thermal_expansion",
+    "radiation_power",
     "rms_molecular_speed",
     "sensible_heat",
     "specific_heat_capacity",

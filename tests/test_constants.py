@@ -32,3 +32,6 @@ def test_fundamental_constant_values_and_dimensions() -> None:
         8.31446261815324
     )
     assert constants.STANDARD_ATMOSPHERE.to("Pa").magnitude == pytest.approx(101_325)
+    assert constants.STEFAN_BOLTZMANN_CONSTANT.to("W / (m^2 * K^4)").magnitude == pytest.approx(
+        5.670374419e-8, rel=1e-9
+    )

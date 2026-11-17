@@ -6,11 +6,16 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError
-from physu.constants import BOLTZMANN_CONSTANT, MOLAR_GAS_CONSTANT
+from physu.constants import (
+    BOLTZMANN_CONSTANT,
+    MOLAR_GAS_CONSTANT,
+    STEFAN_BOLTZMANN_CONSTANT,
+)
 from physu.thermodynamics import (
     average_molecular_kinetic_energy,
     carnot_efficiency,
     combined_gas_law,
+    conduction_heat_rate,
     equilibrium_temperature,
     ideal_gas_moles,
     ideal_gas_pressure,
@@ -22,6 +27,7 @@ from physu.thermodynamics import (
     isothermal_work,
     latent_heat,
     linear_thermal_expansion,
+    radiation_power,
     rms_molecular_speed,
     sensible_heat,
     specific_heat_capacity,
@@ -281,3 +287,39 @@ def test_thermodynamic_laws_validation_errors() -> None:
         carnot_efficiency("300 K", "0 K")
     with pytest.raises(PhysicalDomainError):
         isothermal_entropy_change("100 J", "0 K")
+
+
+def test_heat_transfer_calculations() -> None:
+    q_cond = conduction_heat_rate("0.8 W / (m * K)", "2 m^2", "20 delta_degC", "1 cm")
+    assert str(q_cond.units) == "watt"
+    assert q_cond.to("kW").magnitude == pytest.approx(3.2)
+
+    p_rad = radiation_power(1.0, "1 m^2", "500 K")
+    expected_rad = STEFAN_BOLTZMANN_CONSTANT.magnitude * (500.0**4)
+    assert p_rad.to("W").magnitude == pytest.approx(expected_rad)
+
+    p_net = radiation_power(0.9, "2 m^2", "400 K", ambient_temperature="300 K")
+    expected_net = 0.9 * STEFAN_BOLTZMANN_CONSTANT.magnitude * 2.0 * (400.0**4 - 300.0**4)
+    assert p_net.to("W").magnitude == pytest.approx(expected_net)
+
+    assert radiation_power(0.8, "1 m^2", "25 degC", ambient_temperature="25 degC").magnitude == 0.0
+
+
+def test_heat_transfer_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        conduction_heat_rate("0.8 W / K", "2 m^2", "20 K", "1 cm")
+    with pytest.raises(pint.DimensionalityError):
+        radiation_power(0.8, "2 m", "300 K")
+
+    with pytest.raises(PhysicalDomainError):
+        conduction_heat_rate("-0.5 W / (m * K)", "2 m^2", "20 K", "1 cm")
+    with pytest.raises(PhysicalDomainError):
+        conduction_heat_rate("0.8 W / (m * K)", "2 m^2", "20 K", "0 cm")
+    with pytest.raises(PhysicalDomainError):
+        radiation_power(1.2, "1 m^2", "300 K")
+    with pytest.raises(PhysicalDomainError):
+        radiation_power(-0.1, "1 m^2", "300 K")
+    with pytest.raises(PhysicalDomainError):
+        radiation_power(0.9, "1 m^2", "-10 K")
+    with pytest.raises(PhysicalDomainError):
+        radiation_power(0.9, "1 m^2", "300 K", ambient_temperature="-300 degC")
