@@ -55,6 +55,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `work`: Mechanical work and work-energy theorem (`mechanical_work`, `net_work`, `gravitational_work`, `elastic_work`)
   - `kinetic`: Translational kinetic energy (`kinetic_energy`, `kinetic_energy_from_momentum`, `speed_from_kinetic_energy`, `momentum_from_kinetic_energy`)
   - `potential`: Gravitational and elastic potential energy (`gravitational_potential_energy`, `universal_gravitational_potential_energy`, `elastic_potential_energy`)
+  - `conservation`: Mechanical energy conservation and efficiency (`mechanical_energy`, `non_conservative_work`, `final_speed_conservation`, `final_height_conservation`, `escape_speed`, `mechanical_efficiency`)
 
 ## Development
 

@@ -10,13 +10,19 @@ from physu.constants import GRAVITATIONAL_CONSTANT
 from physu.energy import (
     elastic_potential_energy,
     elastic_work,
+    escape_speed,
+    final_height_conservation,
+    final_speed_conservation,
     gravitational_potential_energy,
     gravitational_work,
     kinetic_energy,
     kinetic_energy_from_momentum,
+    mechanical_efficiency,
+    mechanical_energy,
     mechanical_work,
     momentum_from_kinetic_energy,
     net_work,
+    non_conservative_work,
     speed_from_kinetic_energy,
     universal_gravitational_potential_energy,
 )
@@ -161,3 +167,55 @@ def test_potential_energy_validation_errors() -> None:
         universal_gravitational_potential_energy("1 kg", "2 kg", "0 m")
     with pytest.raises(PhysicalDomainError):
         elastic_potential_energy("-50 N/m", "0.1 m")
+
+
+def test_conservation_calculations_and_conversions() -> None:
+    e_total = mechanical_energy("250 J", "-50 J")
+    assert str(e_total.units) == "joule"
+    assert e_total.magnitude == pytest.approx(200.0)
+
+    w_nc = non_conservative_work("1 kJ", "850 J")
+    assert w_nc.to("J").magnitude == pytest.approx(-150.0)
+
+    # Drop from 20 m with g = 10 m/s^2 starting from rest => v_f = 20 m/s
+    v_f = final_speed_conservation("0 m/s", "20 m", "0 m", gravity="10 m/s^2")
+    assert v_f.to("m/s").magnitude == pytest.approx(20.0)
+
+    # Launch upward at 20 m/s from 5 m to final speed 10 m/s => h_f = 5 + (400 - 100)/20 = 20 m
+    h_f = final_height_conservation("20 m/s", "5 m", "10 m/s", gravity="10 m/s^2")
+    assert h_f.to("m").magnitude == pytest.approx(20.0)
+
+    # Escape speed from Earth surface ~ 11.186 km/s
+    v_esc = escape_speed("5.9722e24 kg", "6371 km")
+    assert v_esc.to("km/s").magnitude == pytest.approx(11.186, rel=1e-3)
+
+    eta = mechanical_efficiency("400 J", "0.5 kJ")
+    assert eta.dimensionless
+    assert eta.magnitude == pytest.approx(0.8)
+    assert eta.to("%").magnitude == pytest.approx(80.0)
+
+
+def test_conservation_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        mechanical_energy("10 N", "5 J")
+    with pytest.raises(pint.DimensionalityError):
+        final_speed_conservation("10 m", "5 m", "0 m")
+    with pytest.raises(pint.DimensionalityError):
+        mechanical_efficiency("10 W", "20 J")
+
+    with pytest.raises(PhysicalDomainError):
+        mechanical_energy("-10 J", "50 J")
+    with pytest.raises(PhysicalDomainError):
+        final_speed_conservation("10 m/s", "0 m", "10 m", gravity="10 m/s^2")
+    with pytest.raises(PhysicalDomainError):
+        final_speed_conservation("-5 m/s", "10 m", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        final_height_conservation("10 m/s", "5 m", "-2 m/s")
+    with pytest.raises(PhysicalDomainError):
+        escape_speed("1e24 kg", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        mechanical_efficiency("-10 J", "100 J")
+    with pytest.raises(PhysicalDomainError):
+        mechanical_efficiency("10 J", "0 J")
+    with pytest.raises(PhysicalDomainError):
+        mechanical_efficiency("120 J", "100 J")
