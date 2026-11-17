@@ -9,8 +9,12 @@ from physu import PhysicalDomainError
 from physu.energy import (
     elastic_work,
     gravitational_work,
+    kinetic_energy,
+    kinetic_energy_from_momentum,
     mechanical_work,
+    momentum_from_kinetic_energy,
     net_work,
+    speed_from_kinetic_energy,
 )
 
 
@@ -70,3 +74,46 @@ def test_work_validation_errors() -> None:
         gravitational_work("2 kg", "5 m", gravity="0 m/s^2")
     with pytest.raises(PhysicalDomainError):
         elastic_work("-100 N/m", "0.1 m", "0 m")
+
+
+def test_kinetic_energy_calculations_and_conversions() -> None:
+    k = kinetic_energy("2000 g", "-10 m/s")
+    assert str(k.units) == "joule"
+    assert k.magnitude == pytest.approx(100.0)
+
+    k_from_p = kinetic_energy_from_momentum("20 N * s", "2 kg")
+    assert k_from_p.to("J").magnitude == pytest.approx(100.0)
+
+    v = speed_from_kinetic_energy("1 kJ", "5 kg")
+    assert v.to("m/s").magnitude == pytest.approx(20.0)
+
+    p = momentum_from_kinetic_energy("100 J", "2 kg")
+    assert p.to("kg * m / s").magnitude == pytest.approx(20.0)
+    assert p.to("N * s").magnitude == pytest.approx(20.0)
+
+    k_zero = momentum_from_kinetic_energy("100 J", "0 kg")
+    assert k_zero.magnitude == 0.0
+
+
+def test_kinetic_energy_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        kinetic_energy("2 m", "10 m/s")
+    with pytest.raises(pint.DimensionalityError):
+        kinetic_energy_from_momentum("20 J", "2 kg")
+    with pytest.raises(pint.DimensionalityError):
+        speed_from_kinetic_energy("100 N", "2 kg")
+
+    with pytest.raises(PhysicalDomainError):
+        kinetic_energy("-2 kg", "10 m/s")
+    with pytest.raises(PhysicalDomainError):
+        kinetic_energy_from_momentum("20 N * s", "0 kg")
+    with pytest.raises(PhysicalDomainError):
+        kinetic_energy_from_momentum("20 N * s", "-2 kg")
+    with pytest.raises(PhysicalDomainError):
+        speed_from_kinetic_energy("-100 J", "2 kg")
+    with pytest.raises(PhysicalDomainError):
+        speed_from_kinetic_energy("100 J", "0 kg")
+    with pytest.raises(PhysicalDomainError):
+        momentum_from_kinetic_energy("-50 J", "2 kg")
+    with pytest.raises(PhysicalDomainError):
+        momentum_from_kinetic_energy("50 J", "-2 kg")

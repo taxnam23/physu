@@ -53,6 +53,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `gravitation`: Universal gravitation and circular dynamics (`gravitational_force`, `gravitational_field_strength`, `orbital_speed`, `centripetal_force`)
 - **`physu.energy`**:
   - `work`: Mechanical work and work-energy theorem (`mechanical_work`, `net_work`, `gravitational_work`, `elastic_work`)
+  - `kinetic`: Translational kinetic energy (`kinetic_energy`, `kinetic_energy_from_momentum`, `speed_from_kinetic_energy`, `momentum_from_kinetic_energy`)
 
 ## Development
 
