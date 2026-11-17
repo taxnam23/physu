@@ -7,7 +7,11 @@ import pytest
 
 from physu import PhysicalDomainError
 from physu.thermodynamics import (
+    equilibrium_temperature,
+    latent_heat,
     linear_thermal_expansion,
+    sensible_heat,
+    specific_heat_capacity,
     temperature_difference,
     to_celsius,
     to_fahrenheit,
@@ -75,3 +79,54 @@ def test_temperature_validation_errors() -> None:
         linear_thermal_expansion("5 m", "1.2e-5 / K", "20 degC")
     with pytest.raises(PhysicalDomainError):
         volumetric_thermal_expansion("-1 liter", "9e-4 / K", "10 K")
+
+
+def test_calorimetry_calculations_and_conversions() -> None:
+    q_sens = sensible_heat("500 g", "4184 J / (kg * K)", "20 delta_degC")
+    assert str(q_sens.units) == "joule"
+    assert q_sens.to("kJ").magnitude == pytest.approx(41.84)
+
+    q_cool = sensible_heat("1 kg", "1 cal / (g * delta_degC)", "-10 K")
+    assert q_cool.to("kcal").magnitude == pytest.approx(-10.0)
+
+    q_lat = latent_heat("2 kg", "334 kJ / kg")
+    assert q_lat.to("kJ").magnitude == pytest.approx(668.0)
+
+    c_spec = specific_heat_capacity("8368 J", "200 g", "10 delta_degC")
+    assert c_spec.to("J / (kg * K)").magnitude == pytest.approx(4184.0)
+
+    t_eq = equilibrium_temperature(
+        [
+            ("200 g", "4184 J / (kg * K)", "80 degC"),
+            ("300 g", "4184 J / (kg * K)", "20 degC"),
+        ]
+    )
+    assert t_eq.to("degC").magnitude == pytest.approx(44.0)
+
+
+def test_calorimetry_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        sensible_heat("1 m", "4184 J / (kg * K)", "10 K")
+    with pytest.raises(pint.DimensionalityError):
+        latent_heat("2 kg", "334 J")
+    with pytest.raises(pint.DimensionalityError):
+        specific_heat_capacity("100 N", "1 kg", "10 K")
+
+    with pytest.raises(PhysicalDomainError):
+        sensible_heat("-1 kg", "4184 J / (kg * K)", "10 K")
+    with pytest.raises(PhysicalDomainError):
+        sensible_heat("1 kg", "4184 J / (kg * K)", "10 degC")
+    with pytest.raises(PhysicalDomainError):
+        latent_heat("1 kg", "-100 J / kg")
+    with pytest.raises(PhysicalDomainError):
+        specific_heat_capacity("100 J", "0 kg", "10 K")
+    with pytest.raises(PhysicalDomainError):
+        specific_heat_capacity("100 J", "1 kg", "0 K")
+    with pytest.raises(PhysicalDomainError):
+        specific_heat_capacity("100 J", "1 kg", "-10 K")
+    with pytest.raises(PhysicalDomainError):
+        equilibrium_temperature([])
+    with pytest.raises(PhysicalDomainError):
+        equilibrium_temperature([("0 kg", "4184 J / (kg * K)", "20 degC")])
+    with pytest.raises(PhysicalDomainError):
+        equilibrium_temperature([("1 kg", "4184 J / (kg * K)", "-300 degC")])

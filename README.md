@@ -60,6 +60,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `power`: Mechanical power (`average_power`, `instantaneous_power`, `work_from_power`, `force_from_power`, `velocity_from_power`)
 - **`physu.thermodynamics`**:
   - `temperature`: Temperature scales and thermal expansion (`to_kelvin`, `to_celsius`, `to_fahrenheit`, `temperature_difference`, `linear_thermal_expansion`, `volumetric_thermal_expansion`)
+  - `calorimetry`: Sensible heat, latent heat, and thermal equilibrium (`sensible_heat`, `latent_heat`, `specific_heat_capacity`, `equilibrium_temperature`)
 
 ## Development
 
