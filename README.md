@@ -58,6 +58,8 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `potential`: Gravitational and elastic potential energy (`gravitational_potential_energy`, `universal_gravitational_potential_energy`, `elastic_potential_energy`)
   - `conservation`: Mechanical energy conservation and efficiency (`mechanical_energy`, `non_conservative_work`, `final_speed_conservation`, `final_height_conservation`, `escape_speed`, `mechanical_efficiency`)
   - `power`: Mechanical power (`average_power`, `instantaneous_power`, `work_from_power`, `force_from_power`, `velocity_from_power`)
+- **`physu.thermodynamics`**:
+  - `temperature`: Temperature scales and thermal expansion (`to_kelvin`, `to_celsius`, `to_fahrenheit`, `temperature_difference`, `linear_thermal_expansion`, `volumetric_thermal_expansion`)
 
 ## Development
 
