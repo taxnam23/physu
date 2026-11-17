@@ -51,6 +51,8 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `elasticity`: Hooke's law and springs (`spring_force`, `spring_force_magnitude`, `spring_constant`, `spring_displacement`, `series_spring_constant`, `parallel_spring_constant`)
   - `momentum`: Linear momentum, impulse, and 1D collisions (`linear_momentum`, `impulse`, `momentum_change`, `average_force`, `collision_velocities`, `elastic_collision_velocities`, `inelastic_collision_velocity`)
   - `gravitation`: Universal gravitation and circular dynamics (`gravitational_force`, `gravitational_field_strength`, `orbital_speed`, `centripetal_force`)
+- **`physu.energy`**:
+  - `work`: Mechanical work and work-energy theorem (`mechanical_work`, `net_work`, `gravitational_work`, `elastic_work`)
 
 ## Development
 
