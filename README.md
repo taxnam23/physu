@@ -33,6 +33,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - [dynamics_forces_and_friction.py](examples/dynamics_forces_and_friction.py) — inclined ramp winch sizing and crate slip threshold
 - [dynamics_elasticity_momentum_gravitation.py](examples/dynamics_elasticity_momentum_gravitation.py) — vehicle suspension sag, rear-end impact force, and CubeSat LEO orbit
 - [energy_work_and_power.py](examples/energy_work_and_power.py) — crane hoist motor sizing, spring coaster launch, and LEO escape speed
+- [thermodynamics.py](examples/thermodynamics.py) — rail expansion gap, steel quenching bath, scuba cylinder pressure, Carnot limit, and window heat loss
 
 ## Modules
 
