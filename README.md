@@ -62,6 +62,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `temperature`: Temperature scales and thermal expansion (`to_kelvin`, `to_celsius`, `to_fahrenheit`, `temperature_difference`, `linear_thermal_expansion`, `volumetric_thermal_expansion`)
   - `calorimetry`: Sensible heat, latent heat, and thermal equilibrium (`sensible_heat`, `latent_heat`, `specific_heat_capacity`, `equilibrium_temperature`)
   - `ideal_gas`: Ideal gas law and kinetic theory (`ideal_gas_pressure`, `ideal_gas_volume`, `ideal_gas_moles`, `ideal_gas_temperature`, `combined_gas_law`, `rms_molecular_speed`, `average_molecular_kinetic_energy`)
+  - `laws`: First/second laws, process work, and engines (`internal_energy_change`, `isobaric_work`, `isothermal_work`, `thermal_efficiency`, `carnot_efficiency`, `isothermal_entropy_change`)
 
 ## Development
 

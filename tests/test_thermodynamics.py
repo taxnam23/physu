@@ -9,18 +9,24 @@ from physu import PhysicalDomainError
 from physu.constants import BOLTZMANN_CONSTANT, MOLAR_GAS_CONSTANT
 from physu.thermodynamics import (
     average_molecular_kinetic_energy,
+    carnot_efficiency,
     combined_gas_law,
     equilibrium_temperature,
     ideal_gas_moles,
     ideal_gas_pressure,
     ideal_gas_temperature,
     ideal_gas_volume,
+    internal_energy_change,
+    isobaric_work,
+    isothermal_entropy_change,
+    isothermal_work,
     latent_heat,
     linear_thermal_expansion,
     rms_molecular_speed,
     sensible_heat,
     specific_heat_capacity,
     temperature_difference,
+    thermal_efficiency,
     to_celsius,
     to_fahrenheit,
     to_kelvin,
@@ -223,3 +229,55 @@ def test_ideal_gas_validation_errors() -> None:
         rms_molecular_speed("300 K", "0 g / mol")
     with pytest.raises(PhysicalDomainError):
         average_molecular_kinetic_energy("-300 degC")
+
+
+def test_thermodynamic_laws_and_efficiency() -> None:
+    du = internal_energy_change("2 kJ", "500 J")
+    assert str(du.units) == "joule"
+    assert du.magnitude == pytest.approx(1500.0)
+
+    w_iso_bar = isobaric_work("200 kPa", "3 liter")
+    assert w_iso_bar.to("J").magnitude == pytest.approx(600.0)
+
+    import math
+
+    w_iso_t = isothermal_work("2 mol", "300 K", "1 liter", "2 liter")
+    expected_w = 2.0 * MOLAR_GAS_CONSTANT.magnitude * 300.0 * math.log(2.0)
+    assert w_iso_t.to("J").magnitude == pytest.approx(expected_w)
+    assert isothermal_work("2 mol", "300 K", "2 liter", "2 liter").magnitude == 0.0
+
+    eta = thermal_efficiency("300 J", "1 kJ")
+    assert eta.dimensionless
+    assert eta.to("%").magnitude == pytest.approx(30.0)
+
+    eta_carnot = carnot_efficiency("300 K", "600 K")
+    assert eta_carnot.to("%").magnitude == pytest.approx(50.0)
+
+    ds = isothermal_entropy_change("3 kJ", "300 K")
+    assert ds.to("J / K").magnitude == pytest.approx(10.0)
+
+
+def test_thermodynamic_laws_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        internal_energy_change("10 N", "5 J")
+    with pytest.raises(pint.DimensionalityError):
+        isobaric_work("100 N", "2 liter")
+    with pytest.raises(pint.DimensionalityError):
+        isothermal_entropy_change("100 J", "10 m")
+
+    with pytest.raises(PhysicalDomainError):
+        isobaric_work("-100 kPa", "1 liter")
+    with pytest.raises(PhysicalDomainError):
+        isothermal_work("1 mol", "300 K", "0 liter", "2 liter")
+    with pytest.raises(PhysicalDomainError):
+        isothermal_work("1 mol", "300 K", "1 liter", "0 liter")
+    with pytest.raises(PhysicalDomainError):
+        thermal_efficiency("-10 J", "100 J")
+    with pytest.raises(PhysicalDomainError):
+        thermal_efficiency("150 J", "100 J")
+    with pytest.raises(PhysicalDomainError):
+        carnot_efficiency("600 K", "300 K")
+    with pytest.raises(PhysicalDomainError):
+        carnot_efficiency("300 K", "0 K")
+    with pytest.raises(PhysicalDomainError):
+        isothermal_entropy_change("100 J", "0 K")
