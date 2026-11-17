@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import conservation, kinetic, potential, work
+from . import conservation, kinetic, potential, power, work
 from .conservation import (
     escape_speed,
     final_height_conservation,
@@ -22,6 +22,13 @@ from .potential import (
     gravitational_potential_energy,
     universal_gravitational_potential_energy,
 )
+from .power import (
+    average_power,
+    force_from_power,
+    instantaneous_power,
+    velocity_from_power,
+    work_from_power,
+)
 from .work import (
     elastic_work,
     gravitational_work,
@@ -30,14 +37,17 @@ from .work import (
 )
 
 __all__ = [
+    "average_power",
     "conservation",
     "elastic_potential_energy",
     "elastic_work",
     "escape_speed",
     "final_height_conservation",
     "final_speed_conservation",
+    "force_from_power",
     "gravitational_potential_energy",
     "gravitational_work",
+    "instantaneous_power",
     "kinetic",
     "kinetic_energy",
     "kinetic_energy_from_momentum",
@@ -48,7 +58,10 @@ __all__ = [
     "net_work",
     "non_conservative_work",
     "potential",
+    "power",
     "speed_from_kinetic_energy",
     "universal_gravitational_potential_energy",
+    "velocity_from_power",
     "work",
+    "work_from_power",
 ]

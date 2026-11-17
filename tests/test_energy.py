@@ -8,13 +8,16 @@ import pytest
 from physu import PhysicalDomainError
 from physu.constants import GRAVITATIONAL_CONSTANT
 from physu.energy import (
+    average_power,
     elastic_potential_energy,
     elastic_work,
     escape_speed,
     final_height_conservation,
     final_speed_conservation,
+    force_from_power,
     gravitational_potential_energy,
     gravitational_work,
+    instantaneous_power,
     kinetic_energy,
     kinetic_energy_from_momentum,
     mechanical_efficiency,
@@ -25,6 +28,8 @@ from physu.energy import (
     non_conservative_work,
     speed_from_kinetic_energy,
     universal_gravitational_potential_energy,
+    velocity_from_power,
+    work_from_power,
 )
 
 
@@ -219,3 +224,56 @@ def test_conservation_validation_errors() -> None:
         mechanical_efficiency("10 J", "0 J")
     with pytest.raises(PhysicalDomainError):
         mechanical_efficiency("120 J", "100 J")
+
+
+def test_power_calculations_and_unit_conversions() -> None:
+    p_avg = average_power("3 kJ", "1 min")
+    assert str(p_avg.units) == "watt"
+    assert p_avg.magnitude == pytest.approx(50.0)
+
+    p_inst = instantaneous_power("100 N", "72 km/h")
+    assert p_inst.to("kW").magnitude == pytest.approx(2.0)
+
+    p_angled = instantaneous_power("100 N", "10 m/s", angle="60 deg")
+    assert p_angled.to("W").magnitude == pytest.approx(500.0)
+
+    p_perp = instantaneous_power("100 N", "10 m/s", angle="90 deg")
+    assert p_perp.magnitude == 0.0
+    assert str(p_perp.magnitude) == "0.0"
+
+    w_kwh = work_from_power("2 kW", "3 hour")
+    assert w_kwh.to("kWh").magnitude == pytest.approx(6.0)
+    assert work_from_power("100 W", "0 s").magnitude == 0.0
+
+    # 1 hp ~= 745.7 W
+    f_hp = force_from_power("1 hp", "10 m/s")
+    assert f_hp.to("N").magnitude == pytest.approx(74.56998715822702, rel=1e-6)
+
+    v_pow = velocity_from_power("1 kW", "200 N", angle="60 deg")
+    assert v_pow.to("m/s").magnitude == pytest.approx(10.0)
+
+
+def test_power_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        average_power("10 N", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        instantaneous_power("10 kg", "5 m/s")
+    with pytest.raises(pint.DimensionalityError):
+        work_from_power("100 J", "5 s")
+    with pytest.raises(pint.DimensionalityError):
+        force_from_power("100 W", "5 s")
+
+    with pytest.raises(PhysicalDomainError):
+        average_power("100 J", "0 s")
+    with pytest.raises(PhysicalDomainError):
+        average_power("100 J", "-2 s")
+    with pytest.raises(PhysicalDomainError):
+        work_from_power("100 W", "-1 s")
+    with pytest.raises(PhysicalDomainError):
+        force_from_power("100 W", "0 m/s")
+    with pytest.raises(PhysicalDomainError):
+        force_from_power("100 W", "5 m/s", angle="90 deg")
+    with pytest.raises(PhysicalDomainError):
+        velocity_from_power("100 W", "0 N")
+    with pytest.raises(PhysicalDomainError):
+        velocity_from_power("100 W", "20 N", angle="90 deg")
