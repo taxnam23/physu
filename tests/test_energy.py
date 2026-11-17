@@ -6,8 +6,11 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError
+from physu.constants import GRAVITATIONAL_CONSTANT
 from physu.energy import (
+    elastic_potential_energy,
     elastic_work,
+    gravitational_potential_energy,
     gravitational_work,
     kinetic_energy,
     kinetic_energy_from_momentum,
@@ -15,6 +18,7 @@ from physu.energy import (
     momentum_from_kinetic_energy,
     net_work,
     speed_from_kinetic_energy,
+    universal_gravitational_potential_energy,
 )
 
 
@@ -117,3 +121,43 @@ def test_kinetic_energy_validation_errors() -> None:
         momentum_from_kinetic_energy("-50 J", "2 kg")
     with pytest.raises(PhysicalDomainError):
         momentum_from_kinetic_energy("50 J", "-2 kg")
+
+
+def test_potential_energy_calculations_and_conversions() -> None:
+    u_g = gravitational_potential_energy("2 kg", "5 m", gravity="10 m/s^2")
+    assert str(u_g.units) == "joule"
+    assert u_g.magnitude == pytest.approx(100.0)
+
+    u_g_below = gravitational_potential_energy("2 kg", "-3 m", gravity="10 m/s^2")
+    assert u_g_below.to("J").magnitude == pytest.approx(-60.0)
+
+    u_univ = universal_gravitational_potential_energy("1e6 kg", "2e6 kg", "4 m")
+    expected_u = -GRAVITATIONAL_CONSTANT.magnitude * 1e6 * 2e6 / 4.0
+    assert u_univ.to("J").magnitude == pytest.approx(expected_u)
+
+    u_zero = universal_gravitational_potential_energy("0 kg", "2 kg", "1 m")
+    assert u_zero.magnitude == 0.0
+    assert str(u_zero.magnitude) == "0.0"
+
+    u_el = elastic_potential_energy("200 N/m", "-10 cm")
+    assert u_el.to("J").magnitude == pytest.approx(1.0)
+
+
+def test_potential_energy_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        gravitational_potential_energy("2 m", "5 m")
+    with pytest.raises(pint.DimensionalityError):
+        universal_gravitational_potential_energy("10 kg", "10 kg", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        elastic_potential_energy("100 N", "0.1 m")
+
+    with pytest.raises(PhysicalDomainError):
+        gravitational_potential_energy("-2 kg", "5 m")
+    with pytest.raises(PhysicalDomainError):
+        gravitational_potential_energy("2 kg", "5 m", gravity="0 m/s^2")
+    with pytest.raises(PhysicalDomainError):
+        universal_gravitational_potential_energy("-1 kg", "2 kg", "1 m")
+    with pytest.raises(PhysicalDomainError):
+        universal_gravitational_potential_energy("1 kg", "2 kg", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        elastic_potential_energy("-50 N/m", "0.1 m")

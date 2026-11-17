@@ -54,6 +54,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - **`physu.energy`**:
   - `work`: Mechanical work and work-energy theorem (`mechanical_work`, `net_work`, `gravitational_work`, `elastic_work`)
   - `kinetic`: Translational kinetic energy (`kinetic_energy`, `kinetic_energy_from_momentum`, `speed_from_kinetic_energy`, `momentum_from_kinetic_energy`)
+  - `potential`: Gravitational and elastic potential energy (`gravitational_potential_energy`, `universal_gravitational_potential_energy`, `elastic_potential_energy`)
 
 ## Development
 
