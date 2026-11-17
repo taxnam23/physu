@@ -1,56 +1,45 @@
-"""Examples covering 1D kinematics: uniform, accelerated (MRUA/SUVAT), and vertical motion."""
+"""Real-world example: highway emergency braking check and bridge clearance drop."""
 
 from __future__ import annotations
 
-from physu import PhysicalDomainError, ureg
 from physu.kinematics import (
     accelerated_displacement,
-    acceleration,
-    average_velocity,
     displacement,
-    final_velocity,
     free_fall_speed,
     free_fall_time,
-    max_height,
-    position,
-    time_to_height,
-    time_to_peak,
-    torricelli_velocity,
-    travel_time,
+    time_to_velocity,
 )
 
 
 def main() -> None:
-    """Run 1D uniform, accelerated, and vertical motion examples."""
-    # 1. Uniform Motion (MRU)
-    dx = displacement("72 km/h", "10 s")
-    pos = position("10 m", "5 m/s", "4 s")
-    v_avg = average_velocity("150 m", "6 s")
-    t_trip = travel_time("300 km", "100 km/h")
-    print(f"[Uniform] dx={dx}, pos={pos}, v_avg={v_avg}, t_trip={t_trip.to('hour')}")
+    """Analyze safe highway braking distance and a dropped inspection sensor."""
+    # Scenario 1: Emergency braking on a wet highway
+    cruise_speed = "110 km/h"
+    reaction_time = "1.2 s"
+    braking_decel = "-6.5 m/s^2"
+    hazard_distance = "95 m"
 
-    # 2. Uniformly Accelerated Motion (MRUA / SUVAT)
-    v_f = final_velocity(10 * (ureg.m / ureg.s), "2 m/s^2", "5 s")
-    dx_acc = accelerated_displacement("10 m/s", "2 m/s^2", "5 s")
-    acc = acceleration("0 m/s", "25 m/s", "5 s")
-    v_torr = torricelli_velocity("0 m/s", "2 m/s^2", "25 m")
-    print(f"[Accelerated] v_f={v_f}, dx={dx_acc}, a={acc}, |v_torr|={v_torr}")
+    reaction_dist = displacement(cruise_speed, reaction_time)
+    braking_time = time_to_velocity(cruise_speed, "0 m/s", braking_decel)
+    braking_dist = accelerated_displacement(cruise_speed, braking_decel, braking_time)
+    total_stopping_dist = reaction_dist + braking_dist
 
-    # 3. Free Fall & Vertical Throw
-    t_fall = free_fall_time("45 m", gravity="10 m/s^2")
-    v_impact = free_fall_speed("45 m", gravity="10 m/s^2")
-    t_peak = time_to_peak("20 m/s", gravity="10 m/s^2")
-    h_max = max_height("20 m/s", initial_height="5 m", gravity="10 m/s^2")
-    up_down_times = time_to_height("20 m/s", "15 m", gravity="10 m/s^2")
-    print(
-        f"[Vertical] t_fall={t_fall}, v_impact={v_impact}, "
-        f"t_peak={t_peak}, h_max={h_max}, times@15m={up_down_times}"
-    )
+    print("=== Highway Emergency Braking ===")
+    print(f"Cruise speed: {cruise_speed} | Reaction distance (1.2 s): {reaction_dist:.2f}")
+    print(f"Braking time: {braking_time:.2f} | Braking distance: {braking_dist:.2f}")
+    print(f"Total stopping distance: {total_stopping_dist:.2f} (hazard at {hazard_distance})")
+    margin = total_stopping_dist.to("m").magnitude
+    print(f"Clears hazard before impact? {'YES' if margin < 95.0 else 'NO'}")
 
-    try:
-        time_to_height("20 m/s", "30 m", gravity="10 m/s^2")
-    except PhysicalDomainError as exc:
-        print("[Vertical] Unreachable height caught:", exc)
+    # Scenario 2: Dropping an acoustic depth probe from a 38 m bridge
+    bridge_height = "38 m"
+    t_splash = free_fall_time(bridge_height)
+    v_splash = free_fall_speed(bridge_height)
+
+    print("\n=== Bridge Drop Sensor Check ===")
+    print(f"Drop height: {bridge_height}")
+    print(f"Time to water impact: {t_splash:.2f}")
+    print(f"Water entry speed: {v_splash:.2f} ({v_splash.to('km/h'):.1f})")
 
 
 if __name__ == "__main__":

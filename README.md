@@ -27,11 +27,12 @@ Requires Python `>= 3.10`.
 
 Runnable scripts covering every module and submodule live in [examples/](examples/):
 
-- [units_and_validation.py](examples/units_and_validation.py) — units, constants, validation helpers, and error handling
-- [kinematics_1d.py](examples/kinematics_1d.py) — uniform, accelerated (MRUA/SUVAT), and vertical motion
-- [kinematics_2d_and_circular.py](examples/kinematics_2d_and_circular.py) — 2D projectile and uniform circular motion
-- [dynamics_forces_and_friction.py](examples/dynamics_forces_and_friction.py) — Newton's laws, inclined planes, and friction
-- [dynamics_elasticity_momentum_gravitation.py](examples/dynamics_elasticity_momentum_gravitation.py) — Hooke's law, momentum/collisions, and gravitation
+- [units_and_validation.py](examples/units_and_validation.py) — drone telemetry normalization and sensor error handling
+- [kinematics_1d.py](examples/kinematics_1d.py) — highway emergency braking and bridge drop check
+- [kinematics_2d_and_circular.py](examples/kinematics_2d_and_circular.py) — firefighter hose targeting and washing machine spin G-load
+- [dynamics_forces_and_friction.py](examples/dynamics_forces_and_friction.py) — inclined ramp winch sizing and crate slip threshold
+- [dynamics_elasticity_momentum_gravitation.py](examples/dynamics_elasticity_momentum_gravitation.py) — vehicle suspension sag, rear-end impact force, and CubeSat LEO orbit
+- [energy_work_and_power.py](examples/energy_work_and_power.py) — crane hoist motor sizing, spring coaster launch, and LEO escape speed
 
 ## Modules
 
