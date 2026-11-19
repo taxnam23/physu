@@ -40,7 +40,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - **`physu.units`**: Centralized `ureg`, `Quantity`, `to_quantity`, `check_dimension`, `convert_to`, `to_si`, and `to_unit`.
 - **`physu.exceptions`**: `PhysuError` and `PhysicalDomainError`.
 - **`physu.validation`**: `validate_quantity`, `require_non_negative`, `require_positive`, `require_non_zero`, and `require_range`.
-- **`physu.constants`**: Fundamental SI / CODATA 2022 constants (`STANDARD_GRAVITY`, `SPEED_OF_LIGHT`, `GRAVITATIONAL_CONSTANT`, `PLANCK_CONSTANT`, `ELEMENTARY_CHARGE`, `BOLTZMANN_CONSTANT`, `AVOGADRO_CONSTANT`, `MOLAR_GAS_CONSTANT`, `STANDARD_ATMOSPHERE`, `STEFAN_BOLTZMANN_CONSTANT`, `ELECTRON_MASS`, `PROTON_MASS`, `VACUUM_PERMITTIVITY`, `VACUUM_PERMEABILITY`).
+- **`physu.constants`**: Fundamental SI / CODATA 2022 constants (`STANDARD_GRAVITY`, `SPEED_OF_LIGHT`, `GRAVITATIONAL_CONSTANT`, `PLANCK_CONSTANT`, `ELEMENTARY_CHARGE`, `BOLTZMANN_CONSTANT`, `AVOGADRO_CONSTANT`, `MOLAR_GAS_CONSTANT`, `STANDARD_ATMOSPHERE`, `STEFAN_BOLTZMANN_CONSTANT`, `ELECTRON_MASS`, `PROTON_MASS`, `VACUUM_PERMITTIVITY`, `VACUUM_PERMEABILITY`, `COULOMB_CONSTANT`).
 - **`physu.kinematics`**:
   - `uniform`: MRU (`displacement`, `position`, `average_velocity`, `travel_time`)
   - `accelerated`: MRUA / SUVAT (`final_velocity`, `displacement`, `position`, `displacement_from_velocities`, `acceleration`, `torricelli_velocity`, `time_to_velocity`, `time_to_displacement`)

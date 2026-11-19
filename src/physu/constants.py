@@ -27,6 +27,10 @@ REDUCED_PLANCK_CONSTANT: pint.Quantity = Quantity(
 ELEMENTARY_CHARGE: pint.Quantity = Quantity(1.602176634e-19, "C")
 VACUUM_PERMITTIVITY: pint.Quantity = Quantity(8.8541878188e-12, "F / m")
 VACUUM_PERMEABILITY: pint.Quantity = Quantity(1.25663706127e-6, "N / A^2")
+COULOMB_CONSTANT: pint.Quantity = to_unit(
+    1.0 / (4.0 * math.pi * VACUUM_PERMITTIVITY),
+    "N * m^2 / C^2",
+)
 
 # Thermodynamics & chemistry
 BOLTZMANN_CONSTANT: pint.Quantity = Quantity(1.380649e-23, "J / K")
@@ -46,6 +50,7 @@ PROTON_MASS: pint.Quantity = Quantity(1.67262192595e-27, "kg")
 __all__ = [
     "AVOGADRO_CONSTANT",
     "BOLTZMANN_CONSTANT",
+    "COULOMB_CONSTANT",
     "ELECTRON_MASS",
     "ELEMENTARY_CHARGE",
     "GRAVITATIONAL_CONSTANT",

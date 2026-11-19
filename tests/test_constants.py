@@ -26,6 +26,11 @@ def test_fundamental_constant_values_and_dimensions() -> None:
         6.62607015e-34 / (2.0 * math.pi)
     )
     assert constants.ELEMENTARY_CHARGE.to("C").magnitude == pytest.approx(1.602176634e-19)
+    assert constants.VACUUM_PERMITTIVITY.to("F / m").magnitude == pytest.approx(8.8541878188e-12)
+    assert constants.VACUUM_PERMEABILITY.to("N / A^2").magnitude == pytest.approx(1.25663706127e-6)
+    assert constants.COULOMB_CONSTANT.to("N * m^2 / C^2").magnitude == pytest.approx(
+        1.0 / (4.0 * math.pi * 8.8541878188e-12)
+    )
     assert constants.BOLTZMANN_CONSTANT.to("J / K").magnitude == pytest.approx(1.380649e-23)
     assert constants.AVOGADRO_CONSTANT.to("1 / mol").magnitude == pytest.approx(6.02214076e23)
     assert constants.MOLAR_GAS_CONSTANT.to("J / (mol * K)").magnitude == pytest.approx(
