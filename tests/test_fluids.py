@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import pint
 import pytest
 
@@ -9,15 +11,22 @@ from physu import PhysicalDomainError
 from physu.constants import STANDARD_ATMOSPHERE, STANDARD_GRAVITY
 from physu.fluids import (
     apparent_weight,
+    bernoulli_pressure,
     buoyant_force,
+    continuity_speed,
+    dynamic_pressure,
     floating_submerged_fraction,
+    flow_speed,
     fluid_density,
     hydrostatic_gauge_pressure,
     hydrostatic_pressure,
+    mass_flow_rate,
     pascal_hydraulic_force,
     pressure_head,
     specific_gravity,
     submerged_volume_floating,
+    torricelli_efflux_speed,
+    volumetric_flow_rate,
 )
 
 
@@ -125,3 +134,55 @@ def test_buoyancy_validation_errors() -> None:
         floating_submerged_fraction("900 kg / m^3", "0 kg / m^3")
     with pytest.raises(PhysicalDomainError):
         submerged_volume_floating("10 kg", "0 kg / m^3")
+
+
+def test_fluid_dynamics_continuity_bernoulli_and_torricelli() -> None:
+    q = volumetric_flow_rate("20 cm^2", "2.5 m / s")
+    assert str(q.units) == "meter ** 3 / second"
+    assert q.to("L / min").magnitude == pytest.approx(300.0)
+
+    v_from_q = flow_speed("300 L / min", "20 cm^2")
+    assert str(v_from_q.units) == "meter / second"
+    assert v_from_q.magnitude == pytest.approx(2.5)
+
+    m_dot = mass_flow_rate("1000 kg / m^3", q)
+    assert str(m_dot.units) == "kilogram / second"
+    assert m_dot.magnitude == pytest.approx(5.0)
+
+    v2 = continuity_speed("20 cm^2", "2.5 m / s", "5 cm^2")
+    assert v2.magnitude == pytest.approx(10.0)
+
+    q_dyn = dynamic_pressure("1.225 kg / m^3", "40 m / s")
+    assert str(q_dyn.units) == "pascal"
+    assert q_dyn.magnitude == pytest.approx(0.5 * 1.225 * 1600.0)
+
+    # Venturi meter: P1 = 200 kPa, v1 = 2 m/s, v2 = 6 m/s, h1 = h2 => P2 = 200k - 0.5*1000*(36-4)
+    p2 = bernoulli_pressure("200 kPa", "1000 kg / m^3", "2 m / s", "0 m", "6 m / s", "0 m")
+    assert p2.to("kPa").magnitude == pytest.approx(184.0)
+
+    g_std = float(STANDARD_GRAVITY.to("m / s^2").magnitude)
+    v_eff = torricelli_efflux_speed("5 m")
+    assert str(v_eff.units) == "meter / second"
+    assert v_eff.magnitude == pytest.approx(math.sqrt(2.0 * g_std * 5.0))
+
+
+def test_fluid_dynamics_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        volumetric_flow_rate("2 m", "3 m / s")
+    with pytest.raises(pint.DimensionalityError):
+        flow_speed("10 m / s", "2 m^2")
+    with pytest.raises(pint.DimensionalityError):
+        bernoulli_pressure("100 N", "1000 kg / m^3", "1 m/s", "0 m", "2 m/s", "0 m")
+
+    with pytest.raises(PhysicalDomainError):
+        volumetric_flow_rate("-2 cm^2", "1 m / s")
+    with pytest.raises(PhysicalDomainError):
+        flow_speed("10 L / min", "0 cm^2")
+    with pytest.raises(PhysicalDomainError):
+        continuity_speed("10 cm^2", "2 m / s", "0 cm^2")
+    with pytest.raises(PhysicalDomainError):
+        dynamic_pressure("1000 kg / m^3", "-5 m / s")
+    with pytest.raises(PhysicalDomainError):
+        bernoulli_pressure("200 kPa", "1000 kg / m^3", "-2 m / s", "0 m", "6 m / s", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        torricelli_efflux_speed("-2 m")
