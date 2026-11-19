@@ -10,6 +10,11 @@ import pytest
 from physu import PhysicalDomainError
 from physu.constants import STANDARD_GRAVITY
 from physu.waves import (
+    beat_frequency,
+    closed_pipe_harmonic_frequency,
+    closed_pipe_harmonic_wavelength,
+    fundamental_tension_for_frequency,
+    open_pipe_harmonic_frequency,
     physical_pendulum_period,
     shm_acceleration,
     shm_displacement,
@@ -22,6 +27,8 @@ from physu.waves import (
     spherical_wave_intensity,
     spring_mass_angular_frequency,
     spring_mass_period,
+    string_harmonic_frequency,
+    string_harmonic_wavelength,
     string_wave_power,
     string_wave_speed,
     wave_frequency,
@@ -182,3 +189,55 @@ def test_mechanical_waves_validation_errors() -> None:
         wave_intensity("100 W", "0 m^2")
     with pytest.raises(PhysicalDomainError):
         spherical_wave_intensity("100 W", "-2 m")
+
+
+def test_standing_waves_harmonics_tension_and_beats() -> None:
+    # 65 cm guitar string with v = 572 m/s => f_1 = 440 Hz, f_3 = 1320 Hz
+    assert string_harmonic_wavelength(1, "65 cm").to("cm").magnitude == pytest.approx(130.0)
+    assert string_harmonic_wavelength(2, "65 cm").to("cm").magnitude == pytest.approx(65.0)
+    f1 = string_harmonic_frequency(1, "65 cm", "572 m / s")
+    assert str(f1.units) == "hertz"
+    assert f1.magnitude == pytest.approx(440.0)
+    assert open_pipe_harmonic_frequency(3, "65 cm", "572 m / s").magnitude == pytest.approx(1320.0)
+
+    # Closed-open pipe: L = 25 cm, v = 340 m/s => f_1 = 340 Hz, f_3 = 1020 Hz
+    assert closed_pipe_harmonic_wavelength(1, "25 cm").magnitude == pytest.approx(1.0)
+    assert closed_pipe_harmonic_wavelength(3, "25 cm").magnitude == pytest.approx(1.0 / 3.0)
+    assert closed_pipe_harmonic_frequency(1, "25 cm", "340 m / s").magnitude == pytest.approx(340.0)
+    assert closed_pipe_harmonic_frequency(3, "25 cm", "340 m / s").magnitude == pytest.approx(
+        1020.0
+    )
+
+    # Roundtrip string tension -> wave speed -> fundamental frequency
+    tension = fundamental_tension_for_frequency("440 Hz", "65 cm", "0.8 g / m")
+    assert str(tension.units) == "newton"
+    v_check = string_wave_speed(tension, "0.8 g / m")
+    assert string_harmonic_frequency(1, "65 cm", v_check).magnitude == pytest.approx(440.0)
+
+    # Beat frequency
+    assert beat_frequency("440 Hz", "443.5 Hz").magnitude == pytest.approx(3.5)
+    assert beat_frequency("440 Hz", "440 Hz").magnitude == 0.0
+
+
+def test_standing_waves_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        string_harmonic_frequency("1 m", "1 m", "340 m / s")
+    with pytest.raises(pint.DimensionalityError):
+        beat_frequency("440 Hz", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        fundamental_tension_for_frequency("440 Hz", "0.65 m", "1 kg")
+
+    with pytest.raises(PhysicalDomainError):
+        string_harmonic_frequency(0, "1 m", "340 m / s")
+    with pytest.raises(PhysicalDomainError):
+        string_harmonic_frequency(1.5, "1 m", "340 m / s")
+    with pytest.raises(PhysicalDomainError):
+        closed_pipe_harmonic_frequency(2, "1 m", "340 m / s")
+    with pytest.raises(PhysicalDomainError):
+        closed_pipe_harmonic_wavelength(4, "1 m")
+    with pytest.raises(PhysicalDomainError):
+        string_harmonic_wavelength(1, "0 m")
+    with pytest.raises(PhysicalDomainError):
+        fundamental_tension_for_frequency("-440 Hz", "0.65 m", "1 g / m")
+    with pytest.raises(PhysicalDomainError):
+        beat_frequency("-10 Hz", "440 Hz")
