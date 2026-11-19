@@ -21,9 +21,12 @@ from physu.optics import (
     grating_spacing_from_density,
     lateral_magnification,
     lensmaker_focal_length,
+    malus_intensity,
     michelson_displacement,
     mirror_focal_length,
     optical_power,
+    polarization_degree,
+    polarizer_stack_intensity,
     rayleigh_angular_resolution,
     refractive_index,
     single_slit_minimum_angle,
@@ -32,6 +35,7 @@ from physu.optics import (
     thin_film_constructive_thickness,
     thin_lens_focal_length,
     thin_lens_image_distance,
+    unpolarized_polarizer_intensity,
     wavelength_in_medium,
 )
 
@@ -239,3 +243,42 @@ def test_diffraction_validation_errors() -> None:
         bragg_diffraction_angle(0, "0.15 nm", "0.3 nm")
     with pytest.raises(PhysicalDomainError):
         bragg_diffraction_angle(5, "0.15 nm", "0.3 nm")
+
+
+def test_polarization_malus_stacks_and_degree() -> None:
+    i_half = unpolarized_polarizer_intensity("100 W / m^2")
+    assert str(i_half.units) == "watt / meter ** 2"
+    assert i_half.magnitude == pytest.approx(50.0)
+
+    assert malus_intensity("100 W / m^2", "60 deg").magnitude == pytest.approx(25.0)
+    assert malus_intensity("100 W / m^2", "90 deg").magnitude == 0.0
+
+    # Three-polarizer paradox: 45 deg then 45 deg gives I0 * 0.5 * 0.5 = 0.25 I0
+    i_stack = polarizer_stack_intensity("100 W / m^2", ["45 deg", "45 deg"])
+    assert i_stack.magnitude == pytest.approx(25.0)
+
+    p_deg = polarization_degree("80 W / m^2", "20 W / m^2")
+    assert p_deg.dimensionless
+    assert p_deg.magnitude == pytest.approx(0.6)
+    assert polarization_degree("50 W / m^2", "50 W / m^2").magnitude == 0.0
+
+
+def test_polarization_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        malus_intensity("100 W", "30 deg")
+    with pytest.raises(pint.DimensionalityError):
+        malus_intensity("100 W / m^2", "30 m")
+    with pytest.raises(pint.DimensionalityError):
+        polarizer_stack_intensity("100 W / m^2", ["45 deg", "10 s"])
+
+    with pytest.raises(TypeError):
+        polarizer_stack_intensity("100 W / m^2", "45 deg")
+
+    with pytest.raises(PhysicalDomainError):
+        unpolarized_polarizer_intensity("-10 W / m^2")
+    with pytest.raises(PhysicalDomainError):
+        polarizer_stack_intensity("100 W / m^2", [])
+    with pytest.raises(PhysicalDomainError):
+        polarization_degree("0 W / m^2", "0 W / m^2")
+    with pytest.raises(PhysicalDomainError):
+        polarization_degree("20 W / m^2", "40 W / m^2")

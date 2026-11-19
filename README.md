@@ -84,6 +84,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `lenses`: Thin lenses, spherical mirrors, magnification, and optical power (`thin_lens_image_distance`, `thin_lens_focal_length`, `lateral_magnification`, `optical_power`, `combined_optical_power`, `lensmaker_focal_length`, `mirror_focal_length`)
   - `interference`: Young's double slit, thin films, and Michelson interferometer (`double_slit_angle`, `double_slit_fringe_position`, `double_slit_fringe_spacing`, `thin_film_constructive_thickness`, `michelson_displacement`)
   - `diffraction`: Single slit, gratings, Rayleigh resolution, and Bragg's law (`single_slit_minimum_angle`, `diffraction_grating_angle`, `grating_spacing_from_density`, `rayleigh_angular_resolution`, `bragg_diffraction_angle`)
+  - `polarization`: Malus's law, polarizer stacks, and degree of polarization (`malus_intensity`, `unpolarized_polarizer_intensity`, `polarizer_stack_intensity`, `polarization_degree`)
 
 ## Development
 

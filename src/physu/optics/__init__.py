@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import diffraction, interference, lenses, refraction
+from . import diffraction, interference, lenses, polarization, refraction
 from .diffraction import (
     bragg_diffraction_angle,
     diffraction_grating_angle,
@@ -25,6 +25,12 @@ from .lenses import (
     optical_power,
     thin_lens_focal_length,
     thin_lens_image_distance,
+)
+from .polarization import (
+    malus_intensity,
+    polarization_degree,
+    polarizer_stack_intensity,
+    unpolarized_polarizer_intensity,
 )
 from .refraction import (
     brewster_angle,
@@ -50,9 +56,13 @@ __all__ = [
     "lateral_magnification",
     "lenses",
     "lensmaker_focal_length",
+    "malus_intensity",
     "michelson_displacement",
     "mirror_focal_length",
     "optical_power",
+    "polarization",
+    "polarization_degree",
+    "polarizer_stack_intensity",
     "rayleigh_angular_resolution",
     "refraction",
     "refractive_index",
@@ -62,5 +72,6 @@ __all__ = [
     "thin_film_constructive_thickness",
     "thin_lens_focal_length",
     "thin_lens_image_distance",
+    "unpolarized_polarizer_intensity",
     "wavelength_in_medium",
 ]
