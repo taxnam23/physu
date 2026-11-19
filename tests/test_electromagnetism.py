@@ -16,6 +16,10 @@ from physu.constants import (
     VACUUM_PERMITTIVITY,
 )
 from physu.electromagnetism import (
+    capacitance,
+    capacitor_charge,
+    capacitor_energy,
+    capacitor_voltage,
     coulomb_force,
     cyclotron_frequency,
     cyclotron_radius,
@@ -37,7 +41,13 @@ from physu.electromagnetism import (
     ohms_law_current,
     ohms_law_resistance,
     ohms_law_voltage,
+    parallel_capacitance,
+    parallel_plate_capacitance,
     parallel_resistance,
+    rc_charging_voltage,
+    rc_discharging_voltage,
+    rc_time_constant,
+    series_capacitance,
     series_resistance,
     uniform_electric_field,
     voltage_divider,
@@ -333,3 +343,96 @@ def test_magnetism_validation_errors() -> None:
         magnetic_field_solenoid(500, "20 cm", "2 A", relative_permeability=0)
     with pytest.raises(PhysicalDomainError):
         force_per_length_parallel_wires("5 A", "5 A", "-1 cm")
+
+
+def test_capacitors_dielectrics_and_energy() -> None:
+    c_val = capacitance("240 uC", "12 V")
+    assert str(c_val.units) == "farad"
+    assert c_val.to("uF").magnitude == pytest.approx(20.0)
+    assert capacitance("-24 uC", "-12 V").to("uF").magnitude == pytest.approx(2.0)
+    assert capacitance("0 C", "12 V").magnitude == 0.0
+
+    q_val = capacitor_charge("100 uF", "50 V")
+    assert str(q_val.units) == "coulomb"
+    assert q_val.to("mC").magnitude == pytest.approx(5.0)
+
+    v_val = capacitor_voltage("5 mC", "100 uF")
+    assert str(v_val.units) == "volt"
+    assert v_val.magnitude == pytest.approx(50.0)
+
+    eps_0 = float(VACUUM_PERMITTIVITY.to("F / m").magnitude)
+    c_plate = parallel_plate_capacitance("10 cm^2", "0.1 mm", relative_permittivity=4.5)
+    assert str(c_plate.units) == "farad"
+    assert c_plate.magnitude == pytest.approx(eps_0 * 4.5 * 10e-4 / 0.1e-3)
+
+    # All 3 capacitor energy forms agree: C = 100 uF, V = 50 V, Q = 5 mC => U = 0.125 J
+    u_cv = capacitor_energy(capacitance="100 uF", voltage="50 V")
+    u_cq = capacitor_energy(capacitance="100 uF", charge="5 mC")
+    u_qv = capacitor_energy(charge="5 mC", voltage="50 V")
+    assert str(u_cv.units) == "joule"
+    assert u_cv.magnitude == pytest.approx(0.125)
+    assert u_cq.magnitude == pytest.approx(0.125)
+    assert u_qv.magnitude == pytest.approx(0.125)
+
+
+def test_capacitor_networks_and_rc_transients() -> None:
+    c_ser = series_capacitance(["6 uF", "3 uF"])
+    assert str(c_ser.units) == "farad"
+    assert c_ser.to("uF").magnitude == pytest.approx(2.0)
+
+    c_par = parallel_capacitance(["100 nF", "400 nF", "0 pF"])
+    assert str(c_par.units) == "farad"
+    assert c_par.to("nF").magnitude == pytest.approx(500.0)
+
+    tau = rc_time_constant("10 kohm", "100 uF")
+    assert str(tau.units) == "second"
+    assert tau.magnitude == pytest.approx(1.0)
+
+    v_chg_0 = rc_charging_voltage("12 V", "0 s", "10 kohm", "100 uF")
+    v_chg_1tau = rc_charging_voltage("12 V", "1 s", "10 kohm", "100 uF")
+    assert v_chg_0.magnitude == 0.0
+    assert v_chg_1tau.magnitude == pytest.approx(12.0 * (1.0 - math.exp(-1.0)))
+
+    v_dis_1tau = rc_discharging_voltage("12 V", "1000 ms", "10 kohm", "100 uF")
+    assert v_dis_1tau.magnitude == pytest.approx(12.0 * math.exp(-1.0))
+
+
+def test_capacitance_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        capacitance("10 C", "5 A")
+    with pytest.raises(pint.DimensionalityError):
+        parallel_plate_capacitance("10 m", "1 mm")
+    with pytest.raises(pint.DimensionalityError):
+        rc_time_constant("10 ohm", "10 H")
+    with pytest.raises(pint.DimensionalityError):
+        series_capacitance(["10 uF", "5 ohm"])
+
+    with pytest.raises(ValueError):
+        capacitor_energy(capacitance="10 uF")
+    with pytest.raises(ValueError):
+        capacitor_energy(capacitance="10 uF", voltage="5 V", charge="50 uC")
+    with pytest.raises(TypeError):
+        parallel_capacitance("10 uF")
+
+    with pytest.raises(PhysicalDomainError):
+        capacitance("10 uC", "0 V")
+    with pytest.raises(PhysicalDomainError):
+        capacitance("10 uC", "-5 V")
+    with pytest.raises(PhysicalDomainError):
+        capacitor_charge("-10 uF", "5 V")
+    with pytest.raises(PhysicalDomainError):
+        capacitor_voltage("10 uC", "0 uF")
+    with pytest.raises(PhysicalDomainError):
+        parallel_plate_capacitance("10 cm^2", "0 mm")
+    with pytest.raises(PhysicalDomainError):
+        parallel_plate_capacitance("10 cm^2", "1 mm", relative_permittivity=0)
+    with pytest.raises(PhysicalDomainError):
+        capacitor_energy(capacitance="0 uF", charge="5 uC")
+    with pytest.raises(PhysicalDomainError):
+        capacitor_energy(charge="5 uC", voltage="-10 V")
+    with pytest.raises(PhysicalDomainError):
+        series_capacitance(["10 uF", "0 uF"])
+    with pytest.raises(PhysicalDomainError):
+        rc_charging_voltage("12 V", "-1 s", "10 kohm", "100 uF")
+    with pytest.raises(PhysicalDomainError):
+        rc_discharging_voltage("12 V", "1 s", "0 ohm", "100 uF")

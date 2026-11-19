@@ -68,6 +68,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - **`physu.electromagnetism`**:
   - `electrostatics`: Coulomb's law, electric fields, potential, work, and Gauss flux (`coulomb_force`, `electric_field_point_charge`, `electric_force`, `uniform_electric_field`, `electric_potential_point_charge`, `electric_potential_energy`, `electric_work`, `electric_flux`, `gauss_electric_flux`)
   - `circuits`: Ohm's law, wire resistivity, DC power, Joule heating, and resistor networks (`ohms_law_voltage`, `ohms_law_current`, `ohms_law_resistance`, `wire_resistance`, `electric_power`, `joule_heating`, `series_resistance`, `parallel_resistance`, `voltage_divider`)
+  - `capacitance`: Capacitors, dielectrics, stored energy, networks, and RC transients (`capacitance`, `capacitor_charge`, `capacitor_voltage`, `parallel_plate_capacitance`, `capacitor_energy`, `series_capacitance`, `parallel_capacitance`, `rc_time_constant`, `rc_charging_voltage`, `rc_discharging_voltage`)
   - `magnetism`: Lorentz force, cyclotron motion, and magnetic fields (`lorentz_magnetic_force`, `magnetic_force_on_wire`, `cyclotron_radius`, `cyclotron_frequency`, `magnetic_field_wire`, `magnetic_field_loop_center`, `magnetic_field_solenoid`, `force_per_length_parallel_wires`)
 
 ## Development

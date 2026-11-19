@@ -2,7 +2,20 @@
 
 from __future__ import annotations
 
+from . import capacitance as capacitance_module
 from . import circuits, electrostatics, magnetism
+from .capacitance import (
+    capacitance,
+    capacitor_charge,
+    capacitor_energy,
+    capacitor_voltage,
+    parallel_capacitance,
+    parallel_plate_capacitance,
+    rc_charging_voltage,
+    rc_discharging_voltage,
+    rc_time_constant,
+    series_capacitance,
+)
 from .circuits import (
     electric_power,
     joule_heating,
@@ -37,6 +50,11 @@ from .magnetism import (
 )
 
 __all__ = [
+    "capacitance",
+    "capacitance_module",
+    "capacitor_charge",
+    "capacitor_energy",
+    "capacitor_voltage",
     "circuits",
     "coulomb_force",
     "cyclotron_frequency",
@@ -61,7 +79,13 @@ __all__ = [
     "ohms_law_current",
     "ohms_law_resistance",
     "ohms_law_voltage",
+    "parallel_capacitance",
+    "parallel_plate_capacitance",
     "parallel_resistance",
+    "rc_charging_voltage",
+    "rc_discharging_voltage",
+    "rc_time_constant",
+    "series_capacitance",
     "series_resistance",
     "uniform_electric_field",
     "voltage_divider",
