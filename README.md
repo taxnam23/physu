@@ -65,6 +65,8 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `ideal_gas`: Ideal gas law and kinetic theory (`ideal_gas_pressure`, `ideal_gas_volume`, `ideal_gas_moles`, `ideal_gas_temperature`, `combined_gas_law`, `rms_molecular_speed`, `average_molecular_kinetic_energy`)
   - `laws`: First/second laws, process work, and engines (`internal_energy_change`, `isobaric_work`, `isothermal_work`, `thermal_efficiency`, `carnot_efficiency`, `isothermal_entropy_change`)
   - `heat_transfer`: Conduction and thermal radiation (`conduction_heat_rate`, `radiation_power`)
+- **`physu.electromagnetism`**:
+  - `electrostatics`: Coulomb's law, electric fields, potential, work, and Gauss flux (`coulomb_force`, `electric_field_point_charge`, `electric_force`, `uniform_electric_field`, `electric_potential_point_charge`, `electric_potential_energy`, `electric_work`, `electric_flux`, `gauss_electric_flux`)
 
 ## Development
 
