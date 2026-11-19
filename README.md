@@ -74,6 +74,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `induction`: Magnetic flux, Faraday's law, inductors, RL/LC circuits, and ideal transformers (`magnetic_flux`, `faraday_emf`, `motional_emf`, `solenoid_inductance`, `inductor_energy`, `series_inductance`, `parallel_inductance`, `rl_time_constant`, `lc_resonant_frequency`, `transformer_voltage`, `transformer_current`)
 - **`physu.waves`**:
   - `oscillations`: Simple harmonic motion and pendulums (`spring_mass_angular_frequency`, `spring_mass_period`, `simple_pendulum_period`, `physical_pendulum_period`, `shm_displacement`, `shm_velocity`, `shm_acceleration`, `shm_max_speed`, `shm_max_acceleration`, `shm_energy`, `shm_speed_at_position`)
+  - `mechanical`: Wave kinematics, strings, and intensity (`wave_speed`, `wavelength`, `wave_frequency`, `wavenumber`, `wave_phase_speed`, `string_wave_speed`, `string_wave_power`, `wave_intensity`, `spherical_wave_intensity`)
 
 ## Development
 

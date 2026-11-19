@@ -19,8 +19,17 @@ from physu.waves import (
     shm_speed_at_position,
     shm_velocity,
     simple_pendulum_period,
+    spherical_wave_intensity,
     spring_mass_angular_frequency,
     spring_mass_period,
+    string_wave_power,
+    string_wave_speed,
+    wave_frequency,
+    wave_intensity,
+    wave_phase_speed,
+    wave_speed,
+    wavelength,
+    wavenumber,
 )
 
 
@@ -108,3 +117,68 @@ def test_oscillations_validation_errors() -> None:
         shm_energy("100 N / m", "-2 cm")
     with pytest.raises(PhysicalDomainError):
         shm_speed_at_position("4 rad / s", "10 cm", "12 cm")
+
+
+def test_wave_kinematics_strings_and_intensity() -> None:
+    v = wave_speed("50 cm", "680 Hz")
+    assert str(v.units) == "meter / second"
+    assert v.magnitude == pytest.approx(340.0)
+
+    lam = wavelength("340 m / s", "1.7 kHz")
+    assert str(lam.units) == "meter"
+    assert lam.to("cm").magnitude == pytest.approx(20.0)
+
+    freq = wave_frequency("3e8 m / s", "500 nm")
+    assert str(freq.units) == "hertz"
+    assert freq.to("THz").magnitude == pytest.approx(600.0)
+
+    k = wavenumber("25 cm")
+    assert str(k.units) == "radian / meter"
+    assert k.magnitude == pytest.approx(8.0 * math.pi)
+    assert wave_phase_speed("16*pi rad / s", k).magnitude == pytest.approx(2.0)
+    assert wave_phase_speed("20 rad / s", "5 1 / m").magnitude == pytest.approx(4.0)
+
+    v_str = string_wave_speed("90 N", "10 g / m")
+    assert str(v_str.units) == "meter / second"
+    assert v_str.magnitude == pytest.approx(math.sqrt(90.0 / 0.01))
+
+    p_str = string_wave_power("10 g / m", "50 m / s", "100 rad / s", "2 cm")
+    assert str(p_str.units) == "watt"
+    assert p_str.magnitude == pytest.approx(0.5 * 0.01 * 50.0 * (100.0**2) * (0.02**2))
+
+    intensity = wave_intensity("60 W", "2 m^2")
+    assert str(intensity.units) == "watt / meter ** 2"
+    assert intensity.magnitude == pytest.approx(30.0)
+
+    i_sph = spherical_wave_intensity("100 W", "5 m")
+    assert i_sph.magnitude == pytest.approx(100.0 / (4.0 * math.pi * 25.0))
+
+
+def test_mechanical_waves_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        wave_speed("1 m", "2 s")
+    with pytest.raises(pint.DimensionalityError):
+        string_wave_speed("50 N", "10 kg / m^3")
+    with pytest.raises(pint.DimensionalityError):
+        wave_phase_speed("10 rad / s", "2 m")
+    with pytest.raises(pint.DimensionalityError):
+        wave_intensity("100 J", "2 m^2")
+
+    with pytest.raises(PhysicalDomainError):
+        wave_speed("-1 m", "10 Hz")
+    with pytest.raises(PhysicalDomainError):
+        wavelength("340 m / s", "0 Hz")
+    with pytest.raises(PhysicalDomainError):
+        wave_frequency("340 m / s", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        wavenumber("-0.5 m")
+    with pytest.raises(PhysicalDomainError):
+        wave_phase_speed("10 rad / s", "0 1 / m")
+    with pytest.raises(PhysicalDomainError):
+        string_wave_speed("50 N", "0 kg / m")
+    with pytest.raises(PhysicalDomainError):
+        string_wave_power("10 g / m", "-5 m / s", "10 rad / s", "1 cm")
+    with pytest.raises(PhysicalDomainError):
+        wave_intensity("100 W", "0 m^2")
+    with pytest.raises(PhysicalDomainError):
+        spherical_wave_intensity("100 W", "-2 m")
