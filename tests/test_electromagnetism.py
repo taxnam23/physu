@@ -8,9 +8,17 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError
-from physu.constants import COULOMB_CONSTANT, ELEMENTARY_CHARGE, VACUUM_PERMITTIVITY
+from physu.constants import (
+    COULOMB_CONSTANT,
+    ELECTRON_MASS,
+    ELEMENTARY_CHARGE,
+    VACUUM_PERMEABILITY,
+    VACUUM_PERMITTIVITY,
+)
 from physu.electromagnetism import (
     coulomb_force,
+    cyclotron_frequency,
+    cyclotron_radius,
     electric_field_point_charge,
     electric_flux,
     electric_force,
@@ -18,8 +26,14 @@ from physu.electromagnetism import (
     electric_potential_point_charge,
     electric_power,
     electric_work,
+    force_per_length_parallel_wires,
     gauss_electric_flux,
     joule_heating,
+    lorentz_magnetic_force,
+    magnetic_field_loop_center,
+    magnetic_field_solenoid,
+    magnetic_field_wire,
+    magnetic_force_on_wire,
     ohms_law_current,
     ohms_law_resistance,
     ohms_law_voltage,
@@ -240,3 +254,82 @@ def test_circuits_validation_errors() -> None:
         parallel_resistance(["10 ohm", "0 ohm"])
     with pytest.raises(PhysicalDomainError):
         voltage_divider("5 V", "0 ohm", "0 ohm")
+
+
+def test_lorentz_force_and_cyclotron_motion() -> None:
+    f_lorentz = lorentz_magnetic_force(-ELEMENTARY_CHARGE, "2.0e6 m/s", "500 mT", angle="30 deg")
+    e_val = float(ELEMENTARY_CHARGE.to("C").magnitude)
+    assert str(f_lorentz.units) == "newton"
+    assert f_lorentz.magnitude == pytest.approx(e_val * 2.0e6 * 0.5 * 0.5)
+    assert (
+        lorentz_magnetic_force(ELEMENTARY_CHARGE, "1e5 m/s", "1 T", angle="180 deg").magnitude
+        == 0.0
+    )
+
+    f_wire = magnetic_force_on_wire("-5 A", "40 cm", "250 mT")
+    assert str(f_wire.units) == "newton"
+    assert f_wire.magnitude == pytest.approx(0.5)
+    assert magnetic_force_on_wire("5 A", "40 cm", "250 mT", angle="0 deg").magnitude == 0.0
+
+    r_cyc = cyclotron_radius(ELECTRON_MASS, "1.0e6 m/s", -ELEMENTARY_CHARGE, "10 mT")
+    m_e = float(ELECTRON_MASS.to("kg").magnitude)
+    assert str(r_cyc.units) == "meter"
+    assert r_cyc.magnitude == pytest.approx(m_e * 1.0e6 / (e_val * 0.01))
+
+    f_cyc = cyclotron_frequency(ELEMENTARY_CHARGE, "10 mT", ELECTRON_MASS)
+    assert str(f_cyc.units) == "hertz"
+    assert f_cyc.to("MHz").magnitude == pytest.approx(e_val * 0.01 / (2.0 * math.pi * m_e) / 1e6)
+
+
+def test_magnetic_fields_and_parallel_wires() -> None:
+    mu_0 = float(VACUUM_PERMEABILITY.to("N / A^2").magnitude)
+
+    b_wire = magnetic_field_wire("10 A", "5 cm")
+    assert str(b_wire.units) == "tesla"
+    assert b_wire.to("uT").magnitude == pytest.approx(mu_0 * 10.0 / (2.0 * math.pi * 0.05) * 1e6)
+
+    b_loop = magnetic_field_loop_center("2 A", "10 cm", turns=50, relative_permeability=1.0)
+    assert str(b_loop.units) == "tesla"
+    assert b_loop.magnitude == pytest.approx(mu_0 * 50.0 * 2.0 / (2.0 * 0.1))
+
+    b_sol = magnetic_field_solenoid(500, "20 cm", "2 A", relative_permeability=200)
+    assert str(b_sol.units) == "tesla"
+    assert b_sol.magnitude == pytest.approx(mu_0 * 200.0 * (500.0 / 0.2) * 2.0)
+
+    f_per_l = force_per_length_parallel_wires("10 A", "-10 A", "10 cm")
+    assert str(f_per_l.units) == "newton / meter"
+    assert f_per_l.magnitude == pytest.approx(mu_0 * 100.0 / (2.0 * math.pi * 0.1))
+
+
+def test_magnetism_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        lorentz_magnetic_force("1 C", "10 m/s", "1 V")
+    with pytest.raises(pint.DimensionalityError):
+        magnetic_force_on_wire("2 C", "1 m", "0.5 T")
+    with pytest.raises(pint.DimensionalityError):
+        cyclotron_radius("1 kg", "10 m/s", "1 C", "10 gauss")
+    with pytest.raises(pint.DimensionalityError):
+        magnetic_field_solenoid("500 m", "20 cm", "2 A")
+    with pytest.raises(pint.DimensionalityError):
+        force_per_length_parallel_wires("5 A", "5 A", "10 s")
+
+    with pytest.raises(PhysicalDomainError):
+        lorentz_magnetic_force("1 C", "-10 m/s", "1 T")
+    with pytest.raises(PhysicalDomainError):
+        lorentz_magnetic_force("1 C", "10 m/s", "-1 T")
+    with pytest.raises(PhysicalDomainError):
+        magnetic_force_on_wire("2 A", "-1 m", "0.5 T")
+    with pytest.raises(PhysicalDomainError):
+        cyclotron_radius(ELECTRON_MASS, "10 m/s", "0 C", "1 T")
+    with pytest.raises(PhysicalDomainError):
+        cyclotron_radius(ELECTRON_MASS, "10 m/s", ELEMENTARY_CHARGE, "0 T")
+    with pytest.raises(PhysicalDomainError):
+        cyclotron_frequency(ELEMENTARY_CHARGE, "1 T", "0 kg")
+    with pytest.raises(PhysicalDomainError):
+        magnetic_field_wire("10 A", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        magnetic_field_loop_center("2 A", "10 cm", turns=0)
+    with pytest.raises(PhysicalDomainError):
+        magnetic_field_solenoid(500, "20 cm", "2 A", relative_permeability=0)
+    with pytest.raises(PhysicalDomainError):
+        force_per_length_parallel_wires("5 A", "5 A", "-1 cm")
