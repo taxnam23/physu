@@ -8,12 +8,15 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError
-from physu.constants import STANDARD_GRAVITY
+from physu.constants import MOLAR_GAS_CONSTANT, STANDARD_GRAVITY
 from physu.waves import (
+    acoustic_impedance,
+    acoustic_reflection_coefficient,
     beat_frequency,
     closed_pipe_harmonic_frequency,
     closed_pipe_harmonic_wavelength,
     fundamental_tension_for_frequency,
+    intensity_from_sound_level,
     open_pipe_harmonic_frequency,
     physical_pendulum_period,
     shm_acceleration,
@@ -24,6 +27,9 @@ from physu.waves import (
     shm_speed_at_position,
     shm_velocity,
     simple_pendulum_period,
+    sound_intensity_level,
+    sound_pressure_level,
+    speed_of_sound_ideal_gas,
     spherical_wave_intensity,
     spring_mass_angular_frequency,
     spring_mass_period,
@@ -241,3 +247,65 @@ def test_standing_waves_validation_errors() -> None:
         fundamental_tension_for_frequency("-440 Hz", "0.65 m", "1 g / m")
     with pytest.raises(PhysicalDomainError):
         beat_frequency("-10 Hz", "440 Hz")
+
+
+def test_acoustics_sound_speed_decibels_and_impedance() -> None:
+    r_gas = float(MOLAR_GAS_CONSTANT.to("J / (mol * K)").magnitude)
+    # Dry air at 20 degC (293.15 K), gamma = 1.4, M = 28.97 g / mol => ~343.2 m/s
+    c_air = speed_of_sound_ideal_gas(1.4, "20 degC", "28.97 g / mol")
+    assert str(c_air.units) == "meter / second"
+    assert c_air.magnitude == pytest.approx(math.sqrt(1.4 * r_gas * 293.15 / 0.02897))
+
+    beta = sound_intensity_level("1e-6 W / m^2")
+    assert str(beta.units) == "decibel"
+    assert beta.magnitude == pytest.approx(60.0)
+    assert sound_intensity_level("1e-12 W / m^2").magnitude == 0.0
+
+    intensity = intensity_from_sound_level("85 dB")
+    assert str(intensity.units) == "watt / meter ** 2"
+    assert intensity.magnitude == pytest.approx(1e-12 * (10.0**8.5))
+    assert intensity_from_sound_level("1 Np").magnitude == pytest.approx(
+        1e-12 * math.exp(2.0), rel=1e-9
+    )
+
+    spl = sound_pressure_level("2 Pa")
+    assert str(spl.units) == "decibel"
+    assert spl.magnitude == pytest.approx(100.0)
+
+    z_air = acoustic_impedance("1.204 kg / m^3", "343 m / s")
+    assert str(z_air.units) == "pascal * second / meter"
+    assert z_air.magnitude == pytest.approx(1.204 * 343.0)
+
+    z_water = acoustic_impedance("1000 kg / m^3", "1480 m / s")
+    r_refl = acoustic_reflection_coefficient(z_air, z_water)
+    assert r_refl.dimensionless
+    assert r_refl.magnitude == pytest.approx(((1.48e6 - 412.972) / (1.48e6 + 412.972)) ** 2)
+    assert acoustic_reflection_coefficient(z_air, z_air).magnitude == 0.0
+
+
+def test_acoustics_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        speed_of_sound_ideal_gas(1.4, "20 degC", "28 g")
+    with pytest.raises(pint.DimensionalityError):
+        sound_intensity_level("10 W")
+    with pytest.raises(pint.DimensionalityError):
+        sound_pressure_level("2 N")
+    with pytest.raises(pint.DimensionalityError):
+        acoustic_impedance("1.2 kg / m^2", "343 m / s")
+
+    with pytest.raises(PhysicalDomainError):
+        speed_of_sound_ideal_gas(0, "20 degC", "28.97 g / mol")
+    with pytest.raises(PhysicalDomainError):
+        speed_of_sound_ideal_gas(1.4, "-10 K", "28.97 g / mol")
+    with pytest.raises(PhysicalDomainError):
+        sound_intensity_level("0 W / m^2")
+    with pytest.raises(PhysicalDomainError):
+        intensity_from_sound_level(60)
+    with pytest.raises(PhysicalDomainError):
+        intensity_from_sound_level("1 B")
+    with pytest.raises(PhysicalDomainError):
+        sound_pressure_level("0 Pa")
+    with pytest.raises(PhysicalDomainError):
+        acoustic_impedance("-1 kg / m^3", "343 m / s")
+    with pytest.raises(PhysicalDomainError):
+        acoustic_reflection_coefficient("0 Pa * s / m", "0 Pa * s / m")

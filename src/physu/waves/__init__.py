@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from . import mechanical, oscillations, standing
+from . import acoustics, mechanical, oscillations, standing
+from .acoustics import (
+    acoustic_impedance,
+    acoustic_reflection_coefficient,
+    intensity_from_sound_level,
+    sound_intensity_level,
+    sound_pressure_level,
+    speed_of_sound_ideal_gas,
+)
 from .mechanical import (
     spherical_wave_intensity,
     string_wave_power,
@@ -38,10 +46,14 @@ from .standing import (
 )
 
 __all__ = [
+    "acoustic_impedance",
+    "acoustic_reflection_coefficient",
+    "acoustics",
     "beat_frequency",
     "closed_pipe_harmonic_frequency",
     "closed_pipe_harmonic_wavelength",
     "fundamental_tension_for_frequency",
+    "intensity_from_sound_level",
     "mechanical",
     "open_pipe_harmonic_frequency",
     "oscillations",
@@ -54,6 +66,9 @@ __all__ = [
     "shm_speed_at_position",
     "shm_velocity",
     "simple_pendulum_period",
+    "sound_intensity_level",
+    "sound_pressure_level",
+    "speed_of_sound_ideal_gas",
     "spherical_wave_intensity",
     "spring_mass_angular_frequency",
     "spring_mass_period",

@@ -76,6 +76,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `oscillations`: Simple harmonic motion and pendulums (`spring_mass_angular_frequency`, `spring_mass_period`, `simple_pendulum_period`, `physical_pendulum_period`, `shm_displacement`, `shm_velocity`, `shm_acceleration`, `shm_max_speed`, `shm_max_acceleration`, `shm_energy`, `shm_speed_at_position`)
   - `mechanical`: Wave kinematics, strings, and intensity (`wave_speed`, `wavelength`, `wave_frequency`, `wavenumber`, `wave_phase_speed`, `string_wave_speed`, `string_wave_power`, `wave_intensity`, `spherical_wave_intensity`)
   - `standing`: Standing waves, harmonics, string tension, and beats (`string_harmonic_frequency`, `open_pipe_harmonic_frequency`, `closed_pipe_harmonic_frequency`, `string_harmonic_wavelength`, `closed_pipe_harmonic_wavelength`, `fundamental_tension_for_frequency`, `beat_frequency`)
+  - `acoustics`: Sound speed, decibels, and impedance (`speed_of_sound_ideal_gas`, `sound_intensity_level`, `intensity_from_sound_level`, `sound_pressure_level`, `acoustic_impedance`, `acoustic_reflection_coefficient`)
 
 ## Development
 
