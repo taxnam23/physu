@@ -88,6 +88,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `polarization`: Malus's law, polarizer stacks, and degree of polarization (`malus_intensity`, `unpolarized_polarizer_intensity`, `polarizer_stack_intensity`, `polarization_degree`)
 - **`physu.fluids`**:
   - `hydrostatics`: Density, hydrostatic pressure, Pascal's principle, and head (`fluid_density`, `specific_gravity`, `hydrostatic_gauge_pressure`, `hydrostatic_pressure`, `pascal_hydraulic_force`, `pressure_head`)
+  - `buoyancy`: Archimedes' principle, apparent weight, and floating equilibrium (`buoyant_force`, `apparent_weight`, `floating_submerged_fraction`, `submerged_volume_floating`)
 
 ## Development
 
