@@ -12,11 +12,12 @@ from . import (
     thermodynamics,
     units,
     validation,
+    waves,
 )
 from .exceptions import PhysicalDomainError, PhysuError
 from .units import Quantity, ureg
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
     "PhysicalDomainError",
@@ -33,4 +34,5 @@ __all__ = [
     "units",
     "ureg",
     "validation",
+    "waves",
 ]
