@@ -67,6 +67,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `heat_transfer`: Conduction and thermal radiation (`conduction_heat_rate`, `radiation_power`)
 - **`physu.electromagnetism`**:
   - `electrostatics`: Coulomb's law, electric fields, potential, work, and Gauss flux (`coulomb_force`, `electric_field_point_charge`, `electric_force`, `uniform_electric_field`, `electric_potential_point_charge`, `electric_potential_energy`, `electric_work`, `electric_flux`, `gauss_electric_flux`)
+  - `circuits`: Ohm's law, wire resistivity, DC power, Joule heating, and resistor networks (`ohms_law_voltage`, `ohms_law_current`, `ohms_law_resistance`, `wire_resistance`, `electric_power`, `joule_heating`, `series_resistance`, `parallel_resistance`, `voltage_divider`)
 
 ## Development
 

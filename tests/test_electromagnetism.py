@@ -16,9 +16,18 @@ from physu.electromagnetism import (
     electric_force,
     electric_potential_energy,
     electric_potential_point_charge,
+    electric_power,
     electric_work,
     gauss_electric_flux,
+    joule_heating,
+    ohms_law_current,
+    ohms_law_resistance,
+    ohms_law_voltage,
+    parallel_resistance,
+    series_resistance,
     uniform_electric_field,
+    voltage_divider,
+    wire_resistance,
 )
 
 
@@ -136,3 +145,98 @@ def test_electrostatics_validation_errors() -> None:
         electric_flux("100 V / m", "-2 m^2")
     with pytest.raises(PhysicalDomainError):
         gauss_electric_flux("1 uC", relative_permittivity=0)
+
+
+def test_ohms_law_wire_power_and_joule_heating() -> None:
+    v = ohms_law_voltage("250 mA", "4.7 kohm")
+    assert str(v.units) == "volt"
+    assert v.magnitude == pytest.approx(1175.0)
+
+    i = ohms_law_current("12 V", "4 ohm")
+    assert str(i.units) == "ampere"
+    assert i.magnitude == pytest.approx(3.0)
+
+    r = ohms_law_resistance("24 V", "600 mA")
+    assert str(r.units) == "ohm"
+    assert r.magnitude == pytest.approx(40.0)
+    assert ohms_law_resistance("-12 V", "-3 A").magnitude == pytest.approx(4.0)
+    assert ohms_law_resistance("0 V", "2 A").magnitude == 0.0
+
+    # 100 m copper wire (rho = 1.68e-8 ohm*m), 2.5 mm^2 cross section => 0.672 ohm
+    r_wire = wire_resistance("1.68e-8 ohm * m", "100 m", "2.5 mm^2")
+    assert str(r_wire.units) == "ohm"
+    assert r_wire.magnitude == pytest.approx(0.672)
+
+    # All three power forms agree for V=12 V, I=3 A, R=4 ohm => 36 W
+    p_vi = electric_power(voltage="12 V", current="3 A")
+    p_ir = electric_power(current="3 A", resistance="4 ohm")
+    p_vr = electric_power(voltage="12 V", resistance="4 ohm")
+    assert str(p_vi.units) == "watt"
+    assert p_vi.magnitude == pytest.approx(36.0)
+    assert p_ir.magnitude == pytest.approx(36.0)
+    assert p_vr.magnitude == pytest.approx(36.0)
+
+    # 2 A through 50 ohm for 10 min => 200 W * 600 s = 120 kJ
+    heat = joule_heating("2 A", "50 ohm", "10 min")
+    assert str(heat.units) == "joule"
+    assert heat.to("kJ").magnitude == pytest.approx(120.0)
+
+
+def test_resistor_networks_and_voltage_divider() -> None:
+    r_ser = series_resistance(["100 ohm", "2.2 kohm", "0 ohm"])
+    assert str(r_ser.units) == "ohm"
+    assert r_ser.magnitude == pytest.approx(2300.0)
+
+    r_par = parallel_resistance(["600 ohm", "300 ohm", "200 ohm"])
+    assert str(r_par.units) == "ohm"
+    assert r_par.magnitude == pytest.approx(100.0)
+
+    v_out = voltage_divider("12 V", "10 kohm", "20 kohm")
+    assert str(v_out.units) == "volt"
+    assert v_out.magnitude == pytest.approx(8.0)
+    assert voltage_divider("12 V", "10 kohm", "0 ohm").magnitude == 0.0
+
+
+def test_circuits_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        ohms_law_voltage("2 A", "10 C")
+    with pytest.raises(pint.DimensionalityError):
+        wire_resistance("1.68e-8 ohm", "10 m", "1 mm^2")
+    with pytest.raises(pint.DimensionalityError):
+        electric_power(voltage="12 V", current="2 C")
+    with pytest.raises(pint.DimensionalityError):
+        joule_heating("2 A", "5 ohm", "3 m")
+    with pytest.raises(pint.DimensionalityError):
+        series_resistance(["10 ohm", "5 F"])
+    with pytest.raises(pint.DimensionalityError):
+        voltage_divider("5 A", "10 ohm", "10 ohm")
+
+    with pytest.raises(ValueError):
+        electric_power(voltage="12 V")
+    with pytest.raises(ValueError):
+        electric_power(voltage="12 V", current="3 A", resistance="4 ohm")
+    with pytest.raises(TypeError):
+        series_resistance("10 ohm")
+
+    with pytest.raises(PhysicalDomainError):
+        ohms_law_voltage("2 A", "-5 ohm")
+    with pytest.raises(PhysicalDomainError):
+        ohms_law_current("12 V", "0 ohm")
+    with pytest.raises(PhysicalDomainError):
+        ohms_law_resistance("12 V", "0 A")
+    with pytest.raises(PhysicalDomainError):
+        ohms_law_resistance("12 V", "-3 A")
+    with pytest.raises(PhysicalDomainError):
+        wire_resistance("1.68e-8 ohm * m", "10 m", "0 mm^2")
+    with pytest.raises(PhysicalDomainError):
+        electric_power(voltage="12 V", resistance="0 ohm")
+    with pytest.raises(PhysicalDomainError):
+        electric_power(current="2 A", resistance="-4 ohm")
+    with pytest.raises(PhysicalDomainError):
+        joule_heating("2 A", "4 ohm", "-1 s")
+    with pytest.raises(PhysicalDomainError):
+        series_resistance([])
+    with pytest.raises(PhysicalDomainError):
+        parallel_resistance(["10 ohm", "0 ohm"])
+    with pytest.raises(PhysicalDomainError):
+        voltage_divider("5 V", "0 ohm", "0 ohm")
