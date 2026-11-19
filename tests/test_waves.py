@@ -7,7 +7,7 @@ import math
 import pint
 import pytest
 
-from physu import PhysicalDomainError
+from physu import PhysicalDomainError, waves
 from physu.constants import MOLAR_GAS_CONSTANT, STANDARD_GRAVITY
 from physu.waves import (
     acoustic_impedance,
@@ -369,3 +369,27 @@ def test_doppler_validation_errors() -> None:
         mach_number("100 m / s", "0 m / s")
     with pytest.raises(PhysicalDomainError):
         mach_angle("300 m / s", "340 m / s")
+
+
+def test_waves_external_registry_nonfinite_and_exports() -> None:
+    ext_ureg = pint.UnitRegistry()
+    v_ext = wave_speed(ext_ureg.Quantity(50, "cm"), ext_ureg.Quantity(2, "kHz"))
+    assert v_ext.magnitude == pytest.approx(1000.0)
+
+    # Non-finite rejection
+    with pytest.raises(PhysicalDomainError):
+        wave_speed("nan m", "10 Hz")
+    with pytest.raises(PhysicalDomainError):
+        doppler_frequency("500 Hz", "inf m / s")
+
+    # Package __all__ completeness across all 5 submodules
+    for submodule in (
+        waves.oscillations,
+        waves.mechanical,
+        waves.standing,
+        waves.acoustics,
+        waves.doppler,
+    ):
+        for symbol in submodule.__all__:
+            assert symbol in waves.__all__
+            assert hasattr(waves, symbol)
