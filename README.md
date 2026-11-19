@@ -86,6 +86,8 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `interference`: Young's double slit, thin films, and Michelson interferometer (`double_slit_angle`, `double_slit_fringe_position`, `double_slit_fringe_spacing`, `thin_film_constructive_thickness`, `michelson_displacement`)
   - `diffraction`: Single slit, gratings, Rayleigh resolution, and Bragg's law (`single_slit_minimum_angle`, `diffraction_grating_angle`, `grating_spacing_from_density`, `rayleigh_angular_resolution`, `bragg_diffraction_angle`)
   - `polarization`: Malus's law, polarizer stacks, and degree of polarization (`malus_intensity`, `unpolarized_polarizer_intensity`, `polarizer_stack_intensity`, `polarization_degree`)
+- **`physu.fluids`**:
+  - `hydrostatics`: Density, hydrostatic pressure, Pascal's principle, and head (`fluid_density`, `specific_gravity`, `hydrostatic_gauge_pressure`, `hydrostatic_pressure`, `pascal_hydraulic_force`, `pressure_head`)
 
 ## Development
 
