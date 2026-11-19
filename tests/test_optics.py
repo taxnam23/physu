@@ -11,10 +11,17 @@ from physu import PhysicalDomainError
 from physu.constants import SPEED_OF_LIGHT
 from physu.optics import (
     brewster_angle,
+    combined_optical_power,
     critical_angle,
+    lateral_magnification,
+    lensmaker_focal_length,
+    mirror_focal_length,
+    optical_power,
     refractive_index,
     snell_refraction_angle,
     speed_in_medium,
+    thin_lens_focal_length,
+    thin_lens_image_distance,
     wavelength_in_medium,
 )
 
@@ -77,3 +84,63 @@ def test_refraction_validation_errors() -> None:
         critical_angle(1.0, 1.5)
     with pytest.raises(PhysicalDomainError):
         brewster_angle(0, 1.5)
+
+
+def test_lenses_mirrors_and_optical_power() -> None:
+    # Converging lens f = 20 cm, object at 30 cm => image at 60 cm, M = -2
+    d_i = thin_lens_image_distance("20 cm", "30 cm")
+    assert str(d_i.units) == "meter"
+    assert d_i.to("cm").magnitude == pytest.approx(60.0)
+
+    f_check = thin_lens_focal_length("30 cm", d_i)
+    assert f_check.to("cm").magnitude == pytest.approx(20.0)
+
+    mag = lateral_magnification("30 cm", d_i)
+    assert mag.dimensionless
+    assert mag.magnitude == pytest.approx(-2.0)
+
+    # Diverging lens f = -25 cm => power = -4.0 / m
+    p_div = optical_power("-25 cm")
+    assert str(p_div.units) == "1 / meter"
+    assert p_div.magnitude == pytest.approx(-4.0)
+
+    p_comb = combined_optical_power(["20 cm", "-25 cm"])
+    assert str(p_comb.units) == "1 / meter"
+    assert p_comb.magnitude == pytest.approx(1.0)
+
+    # Symmetric biconvex lens n = 1.5, R1 = +20 cm, R2 = -20 cm => f = 20 cm
+    f_maker = lensmaker_focal_length(1.5, "20 cm", "-20 cm")
+    assert f_maker.to("cm").magnitude == pytest.approx(20.0)
+
+    assert mirror_focal_length("-40 cm").to("cm").magnitude == pytest.approx(-20.0)
+
+
+def test_lenses_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        thin_lens_image_distance("20 cm", "30 s")
+    with pytest.raises(pint.DimensionalityError):
+        optical_power("5 s")
+    with pytest.raises(pint.DimensionalityError):
+        combined_optical_power(["20 cm", "10 s"])
+
+    with pytest.raises(TypeError):
+        combined_optical_power("20 cm")
+
+    with pytest.raises(PhysicalDomainError):
+        thin_lens_image_distance("20 cm", "20 cm")
+    with pytest.raises(PhysicalDomainError):
+        thin_lens_image_distance("0 cm", "30 cm")
+    with pytest.raises(PhysicalDomainError):
+        thin_lens_focal_length("20 cm", "-20 cm")
+    with pytest.raises(PhysicalDomainError):
+        lateral_magnification("0 cm", "20 cm")
+    with pytest.raises(PhysicalDomainError):
+        optical_power("0 m")
+    with pytest.raises(PhysicalDomainError):
+        combined_optical_power([])
+    with pytest.raises(PhysicalDomainError):
+        lensmaker_focal_length(1.5, "20 cm", "-20 cm", surrounding_index=1.5)
+    with pytest.raises(PhysicalDomainError):
+        lensmaker_focal_length(1.5, "20 cm", "20 cm")
+    with pytest.raises(PhysicalDomainError):
+        lensmaker_focal_length(1.5, "0 cm", "-20 cm")

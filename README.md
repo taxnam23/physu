@@ -81,6 +81,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `doppler`: Acoustic and relativistic Doppler shifts and Mach cone (`doppler_frequency`, `relativistic_doppler_frequency`, `mach_number`, `mach_angle`)
 - **`physu.optics`**:
   - `refraction`: Optical media, Snell's law, critical angle, and Brewster angle (`speed_in_medium`, `wavelength_in_medium`, `refractive_index`, `snell_refraction_angle`, `critical_angle`, `brewster_angle`)
+  - `lenses`: Thin lenses, spherical mirrors, magnification, and optical power (`thin_lens_image_distance`, `thin_lens_focal_length`, `lateral_magnification`, `optical_power`, `combined_optical_power`, `lensmaker_focal_length`, `mirror_focal_length`)
 
 ## Development
 
