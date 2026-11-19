@@ -90,6 +90,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `hydrostatics`: Density, hydrostatic pressure, Pascal's principle, and head (`fluid_density`, `specific_gravity`, `hydrostatic_gauge_pressure`, `hydrostatic_pressure`, `pascal_hydraulic_force`, `pressure_head`)
   - `buoyancy`: Archimedes' principle, apparent weight, and floating equilibrium (`buoyant_force`, `apparent_weight`, `floating_submerged_fraction`, `submerged_volume_floating`)
   - `dynamics`: Continuity, flow rates, Bernoulli, and Torricelli efflux (`volumetric_flow_rate`, `flow_speed`, `mass_flow_rate`, `continuity_speed`, `dynamic_pressure`, `bernoulli_pressure`, `torricelli_efflux_speed`)
+  - `viscosity`: Viscosity, Reynolds number, Poiseuille flow, and Stokes drag (`kinematic_viscosity`, `reynolds_number`, `poiseuille_flow_rate`, `stokes_drag_force`, `stokes_terminal_velocity`)
 
 ## Development
 

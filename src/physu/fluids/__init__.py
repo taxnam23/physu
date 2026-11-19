@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import buoyancy, dynamics, hydrostatics
+from . import buoyancy, dynamics, hydrostatics, viscosity
 from .buoyancy import (
     apparent_weight,
     buoyant_force,
@@ -26,6 +26,13 @@ from .hydrostatics import (
     pressure_head,
     specific_gravity,
 )
+from .viscosity import (
+    kinematic_viscosity,
+    poiseuille_flow_rate,
+    reynolds_number,
+    stokes_drag_force,
+    stokes_terminal_velocity,
+)
 
 __all__ = [
     "apparent_weight",
@@ -41,11 +48,17 @@ __all__ = [
     "hydrostatic_gauge_pressure",
     "hydrostatic_pressure",
     "hydrostatics",
+    "kinematic_viscosity",
     "mass_flow_rate",
     "pascal_hydraulic_force",
+    "poiseuille_flow_rate",
     "pressure_head",
+    "reynolds_number",
     "specific_gravity",
+    "stokes_drag_force",
+    "stokes_terminal_velocity",
     "submerged_volume_floating",
     "torricelli_efflux_speed",
+    "viscosity",
     "volumetric_flow_rate",
 ]

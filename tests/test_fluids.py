@@ -20,10 +20,15 @@ from physu.fluids import (
     fluid_density,
     hydrostatic_gauge_pressure,
     hydrostatic_pressure,
+    kinematic_viscosity,
     mass_flow_rate,
     pascal_hydraulic_force,
+    poiseuille_flow_rate,
     pressure_head,
+    reynolds_number,
     specific_gravity,
+    stokes_drag_force,
+    stokes_terminal_velocity,
     submerged_volume_floating,
     torricelli_efflux_speed,
     volumetric_flow_rate,
@@ -186,3 +191,54 @@ def test_fluid_dynamics_validation_errors() -> None:
         bernoulli_pressure("200 kPa", "1000 kg / m^3", "-2 m / s", "0 m", "6 m / s", "0 m")
     with pytest.raises(PhysicalDomainError):
         torricelli_efflux_speed("-2 m")
+
+
+def test_viscosity_reynolds_poiseuille_and_stokes() -> None:
+    nu = kinematic_viscosity("1 cP", "1000 kg / m^3")
+    assert str(nu.units) == "meter ** 2 / second"
+    assert nu.to("cSt").magnitude == pytest.approx(1.0)
+
+    re = reynolds_number("1000 kg / m^3", "0.5 m / s", "2 cm", "1 cP")
+    assert re.dimensionless
+    assert re.magnitude == pytest.approx(10000.0)
+
+    q_pois = poiseuille_flow_rate("8 kPa", "2 mm", "1 cP", "1 m")
+    assert str(q_pois.units) == "meter ** 3 / second"
+    assert q_pois.magnitude == pytest.approx(math.pi * 8000.0 * (0.002**4) / (8.0 * 0.001 * 1.0))
+
+    f_drag = stokes_drag_force("1.49 Pa * s", "1 mm", "10 cm / s")
+    assert str(f_drag.units) == "newton"
+    assert f_drag.magnitude == pytest.approx(6.0 * math.pi * 1.49 * 0.001 * 0.1)
+
+    g_std = float(STANDARD_GRAVITY.to("m / s^2").magnitude)
+    v_term = stokes_terminal_velocity("0.5 mm", "2500 kg / m^3", "1260 kg / m^3", "1.49 Pa * s")
+    assert str(v_term.units) == "meter / second"
+    assert v_term.magnitude == pytest.approx(
+        2.0 * (0.0005**2) * (2500.0 - 1260.0) * g_std / (9.0 * 1.49)
+    )
+    assert (
+        stokes_terminal_velocity("0.5 mm", "1000 kg / m^3", "1000 kg / m^3", "1 cP").magnitude
+        == 0.0
+    )
+
+
+def test_viscosity_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        kinematic_viscosity("1 Pa", "1000 kg / m^3")
+    with pytest.raises(pint.DimensionalityError):
+        reynolds_number("1000 kg", "1 m / s", "1 cm", "1 cP")
+    with pytest.raises(pint.DimensionalityError):
+        stokes_drag_force("1 cSt", "1 mm", "1 m / s")
+
+    with pytest.raises(PhysicalDomainError):
+        kinematic_viscosity("1 cP", "0 kg / m^3")
+    with pytest.raises(PhysicalDomainError):
+        reynolds_number("1000 kg / m^3", "1 m / s", "1 cm", "0 Pa * s")
+    with pytest.raises(PhysicalDomainError):
+        poiseuille_flow_rate("-100 Pa", "2 mm", "1 cP", "1 m")
+    with pytest.raises(PhysicalDomainError):
+        poiseuille_flow_rate("100 Pa", "2 mm", "1 cP", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        stokes_drag_force("-1 cP", "1 mm", "1 m / s")
+    with pytest.raises(PhysicalDomainError):
+        stokes_terminal_velocity("1 mm", "2500 kg / m^3", "1000 kg / m^3", "0 Pa * s")
