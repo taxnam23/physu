@@ -37,6 +37,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - [electromagnetism.py](examples/electromagnetism.py) — flash capacitor bank, copper feeder cable, proton cyclotron solenoid, and substation transformer
 - [waves.py](examples/waves.py) — vehicle suspension SHM, guitar harmonics, PA decibel level, ultrasound reflection, and supersonic Mach cone
 - [optics.py](examples/optics.py) — optical fiber TIR, projector lens, thin-film interference, spectrometer grating, and telescope Rayleigh limit
+- [fluids.py](examples/fluids.py) — ocean pressure, iceberg buoyancy, Venturi flow, Poiseuille/Stokes viscosity, and capillary meniscus
 
 ## Modules
 
@@ -91,6 +92,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `buoyancy`: Archimedes' principle, apparent weight, and floating equilibrium (`buoyant_force`, `apparent_weight`, `floating_submerged_fraction`, `submerged_volume_floating`)
   - `dynamics`: Continuity, flow rates, Bernoulli, and Torricelli efflux (`volumetric_flow_rate`, `flow_speed`, `mass_flow_rate`, `continuity_speed`, `dynamic_pressure`, `bernoulli_pressure`, `torricelli_efflux_speed`)
   - `viscosity`: Viscosity, Reynolds number, Poiseuille flow, and Stokes drag (`kinematic_viscosity`, `reynolds_number`, `poiseuille_flow_rate`, `stokes_drag_force`, `stokes_terminal_velocity`)
+  - `capillarity`: Surface tension, Young-Laplace pressure, and capillary rise (`surface_tension_force`, `laplace_bubble_pressure`, `capillary_rise_height`)
 
 ## Development
 

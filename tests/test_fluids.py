@@ -7,12 +7,13 @@ import math
 import pint
 import pytest
 
-from physu import PhysicalDomainError
+from physu import PhysicalDomainError, fluids
 from physu.constants import STANDARD_ATMOSPHERE, STANDARD_GRAVITY
 from physu.fluids import (
     apparent_weight,
     bernoulli_pressure,
     buoyant_force,
+    capillary_rise_height,
     continuity_speed,
     dynamic_pressure,
     floating_submerged_fraction,
@@ -21,6 +22,7 @@ from physu.fluids import (
     hydrostatic_gauge_pressure,
     hydrostatic_pressure,
     kinematic_viscosity,
+    laplace_bubble_pressure,
     mass_flow_rate,
     pascal_hydraulic_force,
     poiseuille_flow_rate,
@@ -30,6 +32,7 @@ from physu.fluids import (
     stokes_drag_force,
     stokes_terminal_velocity,
     submerged_volume_floating,
+    surface_tension_force,
     torricelli_efflux_speed,
     volumetric_flow_rate,
 )
@@ -242,3 +245,102 @@ def test_viscosity_validation_errors() -> None:
         stokes_drag_force("-1 cP", "1 mm", "1 m / s")
     with pytest.raises(PhysicalDomainError):
         stokes_terminal_velocity("1 mm", "2500 kg / m^3", "1000 kg / m^3", "0 Pa * s")
+
+
+def test_capillarity_surface_tension_laplace_and_rise() -> None:
+    f_surf = surface_tension_force("72.8 mN / m", "10 cm")
+    assert str(f_surf.units) == "newton"
+    assert f_surf.to("mN").magnitude == pytest.approx(7.28)
+
+    # Soap bubble (2 interfaces): 4*gamma/R ; water droplet (1 interface): 2*gamma/R
+    dp_bubble = laplace_bubble_pressure("25 dyne / cm", "1 cm", interfaces=2)
+    assert str(dp_bubble.units) == "pascal"
+    assert dp_bubble.magnitude == pytest.approx(4.0 * 0.025 / 0.01)
+
+    dp_drop = laplace_bubble_pressure("72.8 mN / m", "1 mm", interfaces=1)
+    assert dp_drop.magnitude == pytest.approx(2.0 * 0.0728 / 0.001)
+
+    g_std = float(STANDARD_GRAVITY.to("m / s^2").magnitude)
+    h_water = capillary_rise_height("72.8 mN / m", "1000 kg / m^3", "0.5 mm")
+    assert str(h_water.units) == "meter"
+    assert h_water.magnitude == pytest.approx(2.0 * 0.0728 / (1000.0 * g_std * 0.0005))
+
+    # Mercury non-wetting contact angle (140 deg) => negative capillary depression
+    h_hg = capillary_rise_height(
+        "486.5 mN / m",
+        "13.5951 g / cm^3",
+        "0.5 mm",
+        contact_angle="140 deg",
+    )
+    assert h_hg.magnitude < 0.0
+    assert capillary_rise_height(
+        "72.8 mN / m",
+        "1000 kg / m^3",
+        "0.5 mm",
+        contact_angle="90 deg",
+    ).magnitude == 0.0
+
+
+def test_capillarity_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        surface_tension_force("72 mN", "10 cm")
+    with pytest.raises(pint.DimensionalityError):
+        capillary_rise_height("72.8 mN / m", "1000 kg / m^3", "0.5 mm", contact_angle="30 m")
+
+    with pytest.raises(PhysicalDomainError):
+        surface_tension_force("-10 mN / m", "10 cm")
+    with pytest.raises(PhysicalDomainError):
+        laplace_bubble_pressure("25 mN / m", "0 cm")
+    with pytest.raises(PhysicalDomainError):
+        laplace_bubble_pressure("25 mN / m", "1 cm", interfaces=3)
+    with pytest.raises(PhysicalDomainError):
+        laplace_bubble_pressure("25 mN / m", "1 cm", interfaces=1.5)
+    with pytest.raises(PhysicalDomainError):
+        capillary_rise_height("72.8 mN / m", "0 kg / m^3", "0.5 mm")
+    with pytest.raises(PhysicalDomainError):
+        capillary_rise_height("72.8 mN / m", "1000 kg / m^3", "0 mm")
+    with pytest.raises(PhysicalDomainError):
+        capillary_rise_height("72.8 mN / m", "1000 kg / m^3", "0.5 mm", contact_angle="-5 deg")
+    with pytest.raises(PhysicalDomainError):
+        capillary_rise_height("72.8 mN / m", "1000 kg / m^3", "0.5 mm", contact_angle="185 deg")
+
+
+def test_fluids_units_external_registry_and_exports() -> None:
+    # Non-SI / CGS / imperial conversions: gal/min, psi, poise, stokes, g/mL
+    v_gal = flow_speed("60 gal / min", "10 cm^2")
+    assert v_gal.magnitude == pytest.approx(3.785411784)
+
+    nu_stokes = kinematic_viscosity("1 poise", "1 g / mL")
+    assert nu_stokes.to("stokes").magnitude == pytest.approx(1.0)
+
+    # Rising air bubble in water (sphere_density < fluid_density) => negative velocity
+    v_bubble = stokes_terminal_velocity("0.2 mm", "1.2 kg / m^3", "1000 kg / m^3", "1 cP")
+    assert v_bubble.magnitude < 0.0
+
+    # External Pint registry compatibility
+    ext_ureg = pint.UnitRegistry()
+    p_ext = hydrostatic_gauge_pressure(
+        ext_ureg.Quantity(1000, "kg / m^3"),
+        ext_ureg.Quantity(10, "m"),
+    )
+    assert p_ext.to("psi").magnitude == pytest.approx(
+        hydrostatic_gauge_pressure("1000 kg / m^3", "10 m").to("psi").magnitude
+    )
+
+    # Non-finite rejection
+    with pytest.raises(PhysicalDomainError):
+        hydrostatic_gauge_pressure("nan kg / m^3", "10 m")
+    with pytest.raises(PhysicalDomainError):
+        reynolds_number("1000 kg / m^3", "inf m / s", "1 cm", "1 cP")
+
+    # Package __all__ completeness across all 5 submodules
+    for submodule in (
+        fluids.hydrostatics,
+        fluids.buoyancy,
+        fluids.dynamics,
+        fluids.viscosity,
+        fluids.capillarity,
+    ):
+        for symbol in submodule.__all__:
+            assert symbol in fluids.__all__
+            assert hasattr(fluids, symbol)
