@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
-from . import buoyancy, dynamics, hydrostatics, viscosity
+from . import buoyancy, capillarity, dynamics, hydrostatics, viscosity
 from .buoyancy import (
     apparent_weight,
     buoyant_force,
     floating_submerged_fraction,
     submerged_volume_floating,
+)
+from .capillarity import (
+    capillary_rise_height,
+    laplace_bubble_pressure,
+    surface_tension_force,
 )
 from .dynamics import (
     bernoulli_pressure,
@@ -39,6 +44,8 @@ __all__ = [
     "bernoulli_pressure",
     "buoyancy",
     "buoyant_force",
+    "capillarity",
+    "capillary_rise_height",
     "continuity_speed",
     "dynamic_pressure",
     "dynamics",
@@ -49,6 +56,7 @@ __all__ = [
     "hydrostatic_pressure",
     "hydrostatics",
     "kinematic_viscosity",
+    "laplace_bubble_pressure",
     "mass_flow_rate",
     "pascal_hydraulic_force",
     "poiseuille_flow_rate",
@@ -58,6 +66,7 @@ __all__ = [
     "stokes_drag_force",
     "stokes_terminal_velocity",
     "submerged_volume_floating",
+    "surface_tension_force",
     "torricelli_efflux_speed",
     "viscosity",
     "volumetric_flow_rate",
