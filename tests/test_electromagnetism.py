@@ -7,7 +7,7 @@ import math
 import pint
 import pytest
 
-from physu import PhysicalDomainError
+from physu import PhysicalDomainError, electromagnetism
 from physu.constants import (
     COULOMB_CONSTANT,
     ELECTRON_MASS,
@@ -536,3 +536,35 @@ def test_induction_validation_errors() -> None:
         transformer_voltage("120 V", 0, 10)
     with pytest.raises(PhysicalDomainError):
         transformer_current("1 A", 10, -5)
+
+
+def test_electromagnetism_units_external_registry_and_exports() -> None:
+    # Battery capacity in mAh and energy in kWh / eV
+    c_bank = capacitance("500 mAh", "3.7 V")
+    assert c_bank.to("F").magnitude == pytest.approx(1800.0 / 3.7)
+
+    heat_kwh = joule_heating("10 A", "20 ohm", "2 hour")
+    assert heat_kwh.to("kWh").magnitude == pytest.approx(4.0)
+
+    # External Pint registry compatibility
+    ext_ureg = pint.UnitRegistry()
+    f_ext = coulomb_force(ext_ureg.Quantity(1, "uC"), ext_ureg.Quantity(2, "uC"), "10 cm")
+    assert f_ext.magnitude == pytest.approx(coulomb_force("1 uC", "2 uC", "10 cm").magnitude)
+
+    # Non-finite rejection
+    with pytest.raises(PhysicalDomainError):
+        electric_field_point_charge("nan C", "1 m")
+    with pytest.raises(PhysicalDomainError):
+        ohms_law_current("inf V", "10 ohm")
+
+    # Package __all__ completeness across all 5 submodules
+    for submodule in (
+        electromagnetism.electrostatics,
+        electromagnetism.circuits,
+        electromagnetism.capacitance_module,
+        electromagnetism.magnetism,
+        electromagnetism.induction,
+    ):
+        for symbol in submodule.__all__:
+            assert symbol in electromagnetism.__all__
+            assert hasattr(electromagnetism, symbol)
