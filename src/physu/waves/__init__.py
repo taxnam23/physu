@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import acoustics, mechanical, oscillations, standing
+from . import acoustics, doppler, mechanical, oscillations, standing
 from .acoustics import (
     acoustic_impedance,
     acoustic_reflection_coefficient,
@@ -10,6 +10,12 @@ from .acoustics import (
     sound_intensity_level,
     sound_pressure_level,
     speed_of_sound_ideal_gas,
+)
+from .doppler import (
+    doppler_frequency,
+    mach_angle,
+    mach_number,
+    relativistic_doppler_frequency,
 )
 from .mechanical import (
     spherical_wave_intensity,
@@ -52,12 +58,17 @@ __all__ = [
     "beat_frequency",
     "closed_pipe_harmonic_frequency",
     "closed_pipe_harmonic_wavelength",
+    "doppler",
+    "doppler_frequency",
     "fundamental_tension_for_frequency",
     "intensity_from_sound_level",
+    "mach_angle",
+    "mach_number",
     "mechanical",
     "open_pipe_harmonic_frequency",
     "oscillations",
     "physical_pendulum_period",
+    "relativistic_doppler_frequency",
     "shm_acceleration",
     "shm_displacement",
     "shm_energy",

@@ -15,10 +15,14 @@ from physu.waves import (
     beat_frequency,
     closed_pipe_harmonic_frequency,
     closed_pipe_harmonic_wavelength,
+    doppler_frequency,
     fundamental_tension_for_frequency,
     intensity_from_sound_level,
+    mach_angle,
+    mach_number,
     open_pipe_harmonic_frequency,
     physical_pendulum_period,
+    relativistic_doppler_frequency,
     shm_acceleration,
     shm_displacement,
     shm_energy,
@@ -309,3 +313,59 @@ def test_acoustics_validation_errors() -> None:
         acoustic_impedance("-1 kg / m^3", "343 m / s")
     with pytest.raises(PhysicalDomainError):
         acoustic_reflection_coefficient("0 Pa * s / m", "0 Pa * s / m")
+
+
+def test_doppler_and_mach_cone() -> None:
+    # Ambulance siren 700 Hz approaching at 34 m/s in 340 m/s air, stationary observer
+    f_app = doppler_frequency("700 Hz", "340 m / s", source_velocity="34 m / s")
+    assert str(f_app.units) == "hertz"
+    assert f_app.magnitude == pytest.approx(700.0 * 340.0 / (340.0 - 34.0))
+
+    # Receding source and moving observer
+    f_rec = doppler_frequency(
+        "700 Hz",
+        "340 m / s",
+        observer_velocity="17 m / s",
+        source_velocity="-34 m / s",
+    )
+    assert f_rec.magnitude == pytest.approx(700.0 * (340.0 + 17.0) / (340.0 + 34.0))
+
+    # Relativistic Doppler at beta = 0.6 (approaching => 2x, receding => 0.5x)
+    f_blue = relativistic_doppler_frequency("500 THz", "0.6 m / s", speed_of_light="1 m / s")
+    f_red = relativistic_doppler_frequency("500 THz", "-0.6 m / s", speed_of_light="1 m / s")
+    assert f_blue.to("THz").magnitude == pytest.approx(1000.0)
+    assert f_red.to("THz").magnitude == pytest.approx(250.0)
+
+    # Mach 2 jet => Mach angle = 30 deg
+    m_val = mach_number("680 m / s", "340 m / s")
+    assert m_val.dimensionless
+    assert m_val.magnitude == pytest.approx(2.0)
+
+    mu = mach_angle("680 m / s", "340 m / s")
+    assert str(mu.units) == "radian"
+    assert mu.to("deg").magnitude == pytest.approx(30.0)
+    assert mach_angle("340 m / s", "340 m / s").to("deg").magnitude == pytest.approx(90.0)
+
+
+def test_doppler_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        doppler_frequency("500 Hz", "340 m")
+    with pytest.raises(pint.DimensionalityError):
+        relativistic_doppler_frequency("500 THz", "0.5 s")
+    with pytest.raises(pint.DimensionalityError):
+        mach_number("680 m / s", "340 s")
+
+    with pytest.raises(PhysicalDomainError):
+        doppler_frequency("500 Hz", "340 m / s", source_velocity="340 m / s")
+    with pytest.raises(PhysicalDomainError):
+        doppler_frequency("500 Hz", "340 m / s", observer_velocity="-400 m / s")
+    with pytest.raises(PhysicalDomainError):
+        relativistic_doppler_frequency("500 THz", "1.0 m / s", speed_of_light="1 m / s")
+    with pytest.raises(PhysicalDomainError):
+        relativistic_doppler_frequency("500 THz", "-1.2 m / s", speed_of_light="1 m / s")
+    with pytest.raises(PhysicalDomainError):
+        mach_number("-100 m / s", "340 m / s")
+    with pytest.raises(PhysicalDomainError):
+        mach_number("100 m / s", "0 m / s")
+    with pytest.raises(PhysicalDomainError):
+        mach_angle("300 m / s", "340 m / s")
