@@ -30,25 +30,36 @@ from physu.electromagnetism import (
     electric_potential_point_charge,
     electric_power,
     electric_work,
+    faraday_emf,
     force_per_length_parallel_wires,
     gauss_electric_flux,
+    inductor_energy,
     joule_heating,
+    lc_resonant_frequency,
     lorentz_magnetic_force,
     magnetic_field_loop_center,
     magnetic_field_solenoid,
     magnetic_field_wire,
+    magnetic_flux,
     magnetic_force_on_wire,
+    motional_emf,
     ohms_law_current,
     ohms_law_resistance,
     ohms_law_voltage,
     parallel_capacitance,
+    parallel_inductance,
     parallel_plate_capacitance,
     parallel_resistance,
     rc_charging_voltage,
     rc_discharging_voltage,
     rc_time_constant,
+    rl_time_constant,
     series_capacitance,
+    series_inductance,
     series_resistance,
+    solenoid_inductance,
+    transformer_current,
+    transformer_voltage,
     uniform_electric_field,
     voltage_divider,
     wire_resistance,
@@ -436,3 +447,92 @@ def test_capacitance_validation_errors() -> None:
         rc_charging_voltage("12 V", "-1 s", "10 kohm", "100 uF")
     with pytest.raises(PhysicalDomainError):
         rc_discharging_voltage("12 V", "1 s", "0 ohm", "100 uF")
+
+
+def test_flux_faraday_and_motional_emf() -> None:
+    phi = magnetic_flux("0.5 T", "20 cm^2", angle="60 deg")
+    assert str(phi.units) == "weber"
+    assert phi.to("mWb").magnitude == pytest.approx(0.5)
+    assert magnetic_flux("0.5 T", "20 cm^2", angle="90 deg").magnitude == 0.0
+
+    emf = faraday_emf("5 mWb", "20 ms", turns=100)
+    assert str(emf.units) == "volt"
+    assert emf.magnitude == pytest.approx(-25.0)
+    assert faraday_emf("0 Wb", "20 ms", turns=50).magnitude == 0.0
+
+    emf_mot = motional_emf("0.5 T", "40 cm", "10 m/s")
+    assert str(emf_mot.units) == "volt"
+    assert emf_mot.magnitude == pytest.approx(2.0)
+    assert motional_emf("0.5 T", "40 cm", "10 m/s", angle="0 deg").magnitude == 0.0
+
+
+def test_inductors_rl_lc_and_transformers() -> None:
+    mu_0 = float(VACUUM_PERMEABILITY.to("N / A^2").magnitude)
+    l_sol = solenoid_inductance(500, "10 cm^2", "20 cm", relative_permeability=1.0)
+    assert str(l_sol.units) == "henry"
+    assert l_sol.magnitude == pytest.approx(mu_0 * (500**2) * 10e-4 / 0.2)
+
+    u_l = inductor_energy("10 mH", "-3 A")
+    assert str(u_l.units) == "joule"
+    assert u_l.to("mJ").magnitude == pytest.approx(45.0)
+
+    l_ser = series_inductance(["10 mH", "15 mH", "0 H"])
+    assert str(l_ser.units) == "henry"
+    assert l_ser.to("mH").magnitude == pytest.approx(25.0)
+
+    l_par = parallel_inductance(["60 mH", "30 mH"])
+    assert str(l_par.units) == "henry"
+    assert l_par.to("mH").magnitude == pytest.approx(20.0)
+
+    tau_rl = rl_time_constant("50 mH", "10 ohm")
+    assert str(tau_rl.units) == "second"
+    assert tau_rl.to("ms").magnitude == pytest.approx(5.0)
+
+    f_lc = lc_resonant_frequency("10 mH", "10 uF")
+    assert str(f_lc.units) == "hertz"
+    assert f_lc.magnitude == pytest.approx(1.0 / (2.0 * math.pi * math.sqrt(10e-3 * 10e-6)))
+
+    v_s = transformer_voltage("240 V", 1000, 50)
+    i_s = transformer_current("500 mA", 1000, 50)
+    assert str(v_s.units) == "volt"
+    assert v_s.magnitude == pytest.approx(12.0)
+    assert str(i_s.units) == "ampere"
+    assert i_s.magnitude == pytest.approx(10.0)
+
+
+def test_induction_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        magnetic_flux("0.5 T", "10 m")
+    with pytest.raises(pint.DimensionalityError):
+        faraday_emf("5 mT", "10 ms")
+    with pytest.raises(pint.DimensionalityError):
+        inductor_energy("10 mF", "2 A")
+    with pytest.raises(pint.DimensionalityError):
+        rl_time_constant("10 mH", "5 F")
+    with pytest.raises(pint.DimensionalityError):
+        lc_resonant_frequency("10 mH", "5 ohm")
+
+    with pytest.raises(PhysicalDomainError):
+        magnetic_flux("0.5 T", "-1 m^2")
+    with pytest.raises(PhysicalDomainError):
+        faraday_emf("5 mWb", "0 s")
+    with pytest.raises(PhysicalDomainError):
+        faraday_emf("5 mWb", "1 s", turns=0)
+    with pytest.raises(PhysicalDomainError):
+        motional_emf("-0.5 T", "1 m", "2 m/s")
+    with pytest.raises(PhysicalDomainError):
+        solenoid_inductance(100, "1 cm^2", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        inductor_energy("-10 mH", "2 A")
+    with pytest.raises(PhysicalDomainError):
+        parallel_inductance(["10 mH", "0 H"])
+    with pytest.raises(PhysicalDomainError):
+        rl_time_constant("10 mH", "0 ohm")
+    with pytest.raises(PhysicalDomainError):
+        lc_resonant_frequency("0 H", "10 uF")
+    with pytest.raises(PhysicalDomainError):
+        lc_resonant_frequency("10 mH", "0 F")
+    with pytest.raises(PhysicalDomainError):
+        transformer_voltage("120 V", 0, 10)
+    with pytest.raises(PhysicalDomainError):
+        transformer_current("1 A", 10, -5)

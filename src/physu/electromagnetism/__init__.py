@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from . import capacitance as capacitance_module
-from . import circuits, electrostatics, magnetism
+from . import circuits, electrostatics, induction, magnetism
 from .capacitance import (
     capacitance,
     capacitor_charge,
@@ -38,6 +38,19 @@ from .electrostatics import (
     gauss_electric_flux,
     uniform_electric_field,
 )
+from .induction import (
+    faraday_emf,
+    inductor_energy,
+    lc_resonant_frequency,
+    magnetic_flux,
+    motional_emf,
+    parallel_inductance,
+    rl_time_constant,
+    series_inductance,
+    solenoid_inductance,
+    transformer_current,
+    transformer_voltage,
+)
 from .magnetism import (
     cyclotron_frequency,
     cyclotron_radius,
@@ -67,26 +80,38 @@ __all__ = [
     "electric_power",
     "electric_work",
     "electrostatics",
+    "faraday_emf",
     "force_per_length_parallel_wires",
     "gauss_electric_flux",
+    "induction",
+    "inductor_energy",
     "joule_heating",
+    "lc_resonant_frequency",
     "lorentz_magnetic_force",
     "magnetic_field_loop_center",
     "magnetic_field_solenoid",
     "magnetic_field_wire",
+    "magnetic_flux",
     "magnetic_force_on_wire",
     "magnetism",
+    "motional_emf",
     "ohms_law_current",
     "ohms_law_resistance",
     "ohms_law_voltage",
     "parallel_capacitance",
+    "parallel_inductance",
     "parallel_plate_capacitance",
     "parallel_resistance",
     "rc_charging_voltage",
     "rc_discharging_voltage",
     "rc_time_constant",
+    "rl_time_constant",
     "series_capacitance",
+    "series_inductance",
     "series_resistance",
+    "solenoid_inductance",
+    "transformer_current",
+    "transformer_voltage",
     "uniform_electric_field",
     "voltage_divider",
     "wire_resistance",

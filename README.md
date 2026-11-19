@@ -70,6 +70,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `circuits`: Ohm's law, wire resistivity, DC power, Joule heating, and resistor networks (`ohms_law_voltage`, `ohms_law_current`, `ohms_law_resistance`, `wire_resistance`, `electric_power`, `joule_heating`, `series_resistance`, `parallel_resistance`, `voltage_divider`)
   - `capacitance`: Capacitors, dielectrics, stored energy, networks, and RC transients (`capacitance`, `capacitor_charge`, `capacitor_voltage`, `parallel_plate_capacitance`, `capacitor_energy`, `series_capacitance`, `parallel_capacitance`, `rc_time_constant`, `rc_charging_voltage`, `rc_discharging_voltage`)
   - `magnetism`: Lorentz force, cyclotron motion, and magnetic fields (`lorentz_magnetic_force`, `magnetic_force_on_wire`, `cyclotron_radius`, `cyclotron_frequency`, `magnetic_field_wire`, `magnetic_field_loop_center`, `magnetic_field_solenoid`, `force_per_length_parallel_wires`)
+  - `induction`: Magnetic flux, Faraday's law, inductors, RL/LC circuits, and ideal transformers (`magnetic_flux`, `faraday_emf`, `motional_emf`, `solenoid_inductance`, `inductor_energy`, `series_inductance`, `parallel_inductance`, `rl_time_constant`, `lc_resonant_frequency`, `transformer_voltage`, `transformer_current`)
 
 ## Development
 
