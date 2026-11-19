@@ -7,7 +7,7 @@ import math
 import pint
 import pytest
 
-from physu import PhysicalDomainError
+from physu import PhysicalDomainError, optics
 from physu.constants import SPEED_OF_LIGHT
 from physu.optics import (
     bragg_diffraction_angle,
@@ -282,3 +282,50 @@ def test_polarization_validation_errors() -> None:
         polarization_degree("0 W / m^2", "0 W / m^2")
     with pytest.raises(PhysicalDomainError):
         polarization_degree("20 W / m^2", "40 W / m^2")
+
+
+def test_optics_edge_cases_external_registry_and_exports() -> None:
+    # Grazing incidence air (1.0) -> glass (1.5) at 90 deg equals critical angle
+    theta_grazing = snell_refraction_angle("90 deg", 1.0, 1.5)
+    assert theta_grazing.magnitude == pytest.approx(critical_angle(1.5, 1.0).magnitude)
+
+    # Underwater symmetric glass lens (n=1.5, n0=1.333, R1=+20 cm, R2=-20 cm)
+    f_water = lensmaker_focal_length(1.5, "20 cm", "-20 cm", surrounding_index=1.333)
+    expected_inv_f = ((1.5 / 1.333) - 1.0) * (1.0 / 0.2 - 1.0 / (-0.2))
+    assert f_water.magnitude == pytest.approx(1.0 / expected_inv_f)
+
+    # Thin film with 0 phase shifts, order=1, and crossed analyzer stack -> 0 W / m^2
+    assert thin_film_constructive_thickness("600 nm", 1.5, order=1, phase_shifts=0).to(
+        "nm"
+    ).magnitude == pytest.approx(200.0)
+    assert polarizer_stack_intensity("100 W / m^2", ["30 deg", "90 deg"]).magnitude == 0.0
+
+    # Pint gotcha guard: 'dpt' is decipint (volume), not optical power / grating density
+    with pytest.raises(pint.DimensionalityError):
+        grating_spacing_from_density("5 dpt")
+
+    # External Pint registry compatibility
+    ext_ureg = pint.UnitRegistry()
+    d_i_ext = thin_lens_image_distance(
+        ext_ureg.Quantity(20, "cm"),
+        ext_ureg.Quantity(30, "cm"),
+    )
+    assert d_i_ext.to("cm").magnitude == pytest.approx(60.0)
+
+    # Non-finite rejection
+    with pytest.raises(PhysicalDomainError):
+        wavelength_in_medium("nan nm", 1.5)
+    with pytest.raises(PhysicalDomainError):
+        malus_intensity("inf W / m^2", "30 deg")
+
+    # Package __all__ completeness across all 5 submodules
+    for submodule in (
+        optics.refraction,
+        optics.lenses,
+        optics.interference,
+        optics.diffraction,
+        optics.polarization,
+    ):
+        for symbol in submodule.__all__:
+            assert symbol in optics.__all__
+            assert hasattr(optics, symbol)
