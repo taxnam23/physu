@@ -10,18 +10,23 @@ import pytest
 from physu import PhysicalDomainError
 from physu.constants import SPEED_OF_LIGHT
 from physu.optics import (
+    bragg_diffraction_angle,
     brewster_angle,
     combined_optical_power,
     critical_angle,
+    diffraction_grating_angle,
     double_slit_angle,
     double_slit_fringe_position,
     double_slit_fringe_spacing,
+    grating_spacing_from_density,
     lateral_magnification,
     lensmaker_focal_length,
     michelson_displacement,
     mirror_focal_length,
     optical_power,
+    rayleigh_angular_resolution,
     refractive_index,
+    single_slit_minimum_angle,
     snell_refraction_angle,
     speed_in_medium,
     thin_film_constructive_thickness,
@@ -192,3 +197,45 @@ def test_interference_validation_errors() -> None:
         thin_film_constructive_thickness("532 nm", 0)
     with pytest.raises(PhysicalDomainError):
         michelson_displacement(-10, "632.8 nm")
+
+
+def test_diffraction_slit_grating_rayleigh_and_bragg() -> None:
+    theta_min = single_slit_minimum_angle(1, "500 nm", "1 um")
+    assert str(theta_min.units) == "radian"
+    assert theta_min.to("deg").magnitude == pytest.approx(30.0)
+
+    d_grating = grating_spacing_from_density("500 / mm")
+    assert str(d_grating.units) == "meter"
+    assert d_grating.to("um").magnitude == pytest.approx(2.0)
+
+    theta_gr = diffraction_grating_angle(1, "500 nm", d_grating)
+    assert theta_gr.to("deg").magnitude == pytest.approx(math.degrees(math.asin(0.25)))
+
+    theta_r = rayleigh_angular_resolution("550 nm", "2.4 m")
+    assert str(theta_r.units) == "radian"
+    assert theta_r.to("arcsec").magnitude == pytest.approx(
+        math.degrees(1.22 * 550e-9 / 2.4) * 3600.0
+    )
+
+    theta_bragg = bragg_diffraction_angle(1, "0.15 nm", "0.3 nm")
+    assert theta_bragg.to("deg").magnitude == pytest.approx(math.degrees(math.asin(0.25)))
+
+
+def test_diffraction_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        grating_spacing_from_density("500 mm")
+    with pytest.raises(pint.DimensionalityError):
+        rayleigh_angular_resolution("550 Hz", "2.4 m")
+
+    with pytest.raises(PhysicalDomainError):
+        single_slit_minimum_angle(0, "500 nm", "1 um")
+    with pytest.raises(PhysicalDomainError):
+        single_slit_minimum_angle(3, "500 nm", "1 um")
+    with pytest.raises(PhysicalDomainError):
+        grating_spacing_from_density("0 / mm")
+    with pytest.raises(PhysicalDomainError):
+        rayleigh_angular_resolution("550 nm", "0 m")
+    with pytest.raises(PhysicalDomainError):
+        bragg_diffraction_angle(0, "0.15 nm", "0.3 nm")
+    with pytest.raises(PhysicalDomainError):
+        bragg_diffraction_angle(5, "0.15 nm", "0.3 nm")

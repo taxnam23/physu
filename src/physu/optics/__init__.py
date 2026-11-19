@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
-from . import interference, lenses, refraction
+from . import diffraction, interference, lenses, refraction
+from .diffraction import (
+    bragg_diffraction_angle,
+    diffraction_grating_angle,
+    grating_spacing_from_density,
+    rayleigh_angular_resolution,
+    single_slit_minimum_angle,
+)
 from .interference import (
     double_slit_angle,
     double_slit_fringe_position,
@@ -29,12 +36,16 @@ from .refraction import (
 )
 
 __all__ = [
+    "bragg_diffraction_angle",
     "brewster_angle",
     "combined_optical_power",
     "critical_angle",
+    "diffraction",
+    "diffraction_grating_angle",
     "double_slit_angle",
     "double_slit_fringe_position",
     "double_slit_fringe_spacing",
+    "grating_spacing_from_density",
     "interference",
     "lateral_magnification",
     "lenses",
@@ -42,8 +53,10 @@ __all__ = [
     "michelson_displacement",
     "mirror_focal_length",
     "optical_power",
+    "rayleigh_angular_resolution",
     "refraction",
     "refractive_index",
+    "single_slit_minimum_angle",
     "snell_refraction_angle",
     "speed_in_medium",
     "thin_film_constructive_thickness",
