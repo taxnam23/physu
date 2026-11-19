@@ -13,13 +13,18 @@ from physu.optics import (
     brewster_angle,
     combined_optical_power,
     critical_angle,
+    double_slit_angle,
+    double_slit_fringe_position,
+    double_slit_fringe_spacing,
     lateral_magnification,
     lensmaker_focal_length,
+    michelson_displacement,
     mirror_focal_length,
     optical_power,
     refractive_index,
     snell_refraction_angle,
     speed_in_medium,
+    thin_film_constructive_thickness,
     thin_lens_focal_length,
     thin_lens_image_distance,
     wavelength_in_medium,
@@ -144,3 +149,46 @@ def test_lenses_validation_errors() -> None:
         lensmaker_focal_length(1.5, "20 cm", "20 cm")
     with pytest.raises(PhysicalDomainError):
         lensmaker_focal_length(1.5, "0 cm", "-20 cm")
+
+
+def test_interference_double_slit_thin_film_and_michelson() -> None:
+    theta_1 = double_slit_angle(1, "500 nm", "1 um")
+    assert str(theta_1.units) == "radian"
+    assert theta_1.to("deg").magnitude == pytest.approx(30.0)
+    assert double_slit_angle(0, "500 nm", "1 um").magnitude == 0.0
+
+    dy = double_slit_fringe_spacing("600 nm", "2 m", "0.3 mm")
+    assert str(dy.units) == "meter"
+    assert dy.to("mm").magnitude == pytest.approx(4.0)
+    assert double_slit_fringe_position(3, "600 nm", "2 m", "0.3 mm").to("mm").magnitude == (
+        pytest.approx(12.0)
+    )
+
+    # Soap film (n = 1.33) in air (1 phase shift), m = 0, lambda = 532 nm => 100 nm
+    t_soap = thin_film_constructive_thickness("532 nm", 1.33, order=0, phase_shifts=1)
+    assert t_soap.to("nm").magnitude == pytest.approx(100.0)
+    t_two = thin_film_constructive_thickness("532 nm", 1.33, order=1, phase_shifts=2)
+    assert t_two.to("nm").magnitude == pytest.approx(200.0)
+
+    disp = michelson_displacement(400, "632.8 nm")
+    assert disp.to("um").magnitude == pytest.approx(126.56)
+
+
+def test_interference_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        double_slit_angle(1, "500 Hz", "1 um")
+    with pytest.raises(pint.DimensionalityError):
+        michelson_displacement("10 m", "632.8 nm")
+
+    with pytest.raises(PhysicalDomainError):
+        double_slit_angle(3, "500 nm", "1 um")
+    with pytest.raises(PhysicalDomainError):
+        double_slit_angle(1.5, "500 nm", "1 um")
+    with pytest.raises(PhysicalDomainError):
+        double_slit_fringe_position(1, "500 nm", "2 m", "0 mm")
+    with pytest.raises(PhysicalDomainError):
+        thin_film_constructive_thickness("532 nm", 1.33, phase_shifts=3)
+    with pytest.raises(PhysicalDomainError):
+        thin_film_constructive_thickness("532 nm", 0)
+    with pytest.raises(PhysicalDomainError):
+        michelson_displacement(-10, "632.8 nm")
