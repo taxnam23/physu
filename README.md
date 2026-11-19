@@ -36,6 +36,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - [thermodynamics.py](examples/thermodynamics.py) — rail expansion gap, steel quenching bath, scuba cylinder pressure, Carnot limit, and window heat loss
 - [electromagnetism.py](examples/electromagnetism.py) — flash capacitor bank, copper feeder cable, proton cyclotron solenoid, and substation transformer
 - [waves.py](examples/waves.py) — vehicle suspension SHM, guitar harmonics, PA decibel level, ultrasound reflection, and supersonic Mach cone
+- [optics.py](examples/optics.py) — optical fiber TIR, projector lens, thin-film interference, spectrometer grating, and telescope Rayleigh limit
 
 ## Modules
 
