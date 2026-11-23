@@ -93,6 +93,8 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `dynamics`: Continuity, flow rates, Bernoulli, and Torricelli efflux (`volumetric_flow_rate`, `flow_speed`, `mass_flow_rate`, `continuity_speed`, `dynamic_pressure`, `bernoulli_pressure`, `torricelli_efflux_speed`)
   - `viscosity`: Viscosity, Reynolds number, Poiseuille flow, and Stokes drag (`kinematic_viscosity`, `reynolds_number`, `poiseuille_flow_rate`, `stokes_drag_force`, `stokes_terminal_velocity`)
   - `capillarity`: Surface tension, Young-Laplace pressure, and capillary rise (`surface_tension_force`, `laplace_bubble_pressure`, `capillary_rise_height`)
+- **`physu.modern`**:
+  - `relativity`: Special relativity (`lorentz_factor`, `time_dilation`, `length_contraction`, `relativistic_velocity_addition`, `rest_energy`, `relativistic_total_energy`, `relativistic_kinetic_energy`, `relativistic_momentum`, `energy_momentum_relation`)
 
 ## Development
 
