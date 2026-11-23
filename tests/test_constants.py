@@ -40,3 +40,10 @@ def test_fundamental_constant_values_and_dimensions() -> None:
     assert constants.STEFAN_BOLTZMANN_CONSTANT.to("W / (m^2 * K^4)").magnitude == pytest.approx(
         5.670374419e-8, rel=1e-9
     )
+    assert constants.WIEN_DISPLACEMENT_CONSTANT.to("m * K").magnitude == pytest.approx(
+        2.897771955e-3
+    )
+    assert constants.BOHR_RADIUS.to("m").magnitude == pytest.approx(5.29177210544e-11, rel=1e-9)
+    assert constants.RYDBERG_CONSTANT.to("1 / m").magnitude == pytest.approx(
+        10_973_731.568157, rel=1e-9
+    )

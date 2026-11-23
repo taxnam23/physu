@@ -10,6 +10,7 @@ from . import (
     exceptions,
     fluids,
     kinematics,
+    modern,
     optics,
     thermodynamics,
     units,
@@ -19,7 +20,7 @@ from . import (
 from .exceptions import PhysicalDomainError, PhysuError
 from .units import Quantity, ureg
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 __all__ = [
     "PhysicalDomainError",
@@ -33,6 +34,7 @@ __all__ = [
     "exceptions",
     "fluids",
     "kinematics",
+    "modern",
     "optics",
     "thermodynamics",
     "units",

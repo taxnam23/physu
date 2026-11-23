@@ -42,13 +42,25 @@ STEFAN_BOLTZMANN_CONSTANT: pint.Quantity = to_unit(
     / (15.0 * (PLANCK_CONSTANT**3) * (SPEED_OF_LIGHT**2)),
     "W / (m^2 * K^4)",
 )
+WIEN_DISPLACEMENT_CONSTANT: pint.Quantity = Quantity(2.897771955e-3, "m * K")
 
-# Atomic & particle masses
+# Atomic & particle physics
 ELECTRON_MASS: pint.Quantity = Quantity(9.1093837139e-31, "kg")
 PROTON_MASS: pint.Quantity = Quantity(1.67262192595e-27, "kg")
+BOHR_RADIUS: pint.Quantity = to_unit(
+    (4.0 * math.pi * VACUUM_PERMITTIVITY * (REDUCED_PLANCK_CONSTANT**2))
+    / (ELECTRON_MASS * (ELEMENTARY_CHARGE**2)),
+    "m",
+)
+RYDBERG_CONSTANT: pint.Quantity = to_unit(
+    (ELECTRON_MASS * (ELEMENTARY_CHARGE**4))
+    / (8.0 * (VACUUM_PERMITTIVITY**2) * (PLANCK_CONSTANT**3) * SPEED_OF_LIGHT),
+    "1 / m",
+)
 
 __all__ = [
     "AVOGADRO_CONSTANT",
+    "BOHR_RADIUS",
     "BOLTZMANN_CONSTANT",
     "COULOMB_CONSTANT",
     "ELECTRON_MASS",
@@ -58,10 +70,12 @@ __all__ = [
     "PLANCK_CONSTANT",
     "PROTON_MASS",
     "REDUCED_PLANCK_CONSTANT",
+    "RYDBERG_CONSTANT",
     "SPEED_OF_LIGHT",
     "STANDARD_ATMOSPHERE",
     "STANDARD_GRAVITY",
     "STEFAN_BOLTZMANN_CONSTANT",
     "VACUUM_PERMEABILITY",
     "VACUUM_PERMITTIVITY",
+    "WIEN_DISPLACEMENT_CONSTANT",
 ]

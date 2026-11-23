@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "physu"
-version = "0.8.0"
+version = "0.9.0"
 description = "A modular Python physics library with strict unit and dimensional validation powered by Pint."
 readme = "README.md"
 license = "MIT"
@@ -28,6 +28,9 @@ keywords = [
     "optics",
     "fluids",
     "fluid-mechanics",
+    "modern-physics",
+    "relativity",
+    "quantum-mechanics",
     "scientific-computing",
 ]
 classifiers = [
