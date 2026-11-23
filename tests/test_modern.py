@@ -24,17 +24,23 @@ from physu.modern import (
     compton_wavelength_shift,
     de_broglie_wavelength,
     de_broglie_wavelength_particle,
+    decay_constant,
     energy_momentum_relation,
+    half_life_from_decay_constant,
     heisenberg_min_energy_uncertainty,
     heisenberg_min_momentum_uncertainty,
     infinite_well_energy,
     length_contraction,
     lorentz_factor,
+    mass_energy_equivalence,
     photoelectric_max_kinetic_energy,
     photoelectric_stopping_potential,
     photoelectric_threshold_frequency,
     photon_energy,
     photon_momentum,
+    radioactive_activity,
+    radioactive_remaining,
+    radiometric_age,
     relativistic_kinetic_energy,
     relativistic_momentum,
     relativistic_total_energy,
@@ -292,3 +298,63 @@ def test_atomic_validation_errors() -> None:
         rydberg_wavelength(2, 2)
     with pytest.raises(PhysicalDomainError):
         rydberg_wavelength(3, 2, rydberg_constant="0 / m")
+
+
+def test_nuclear_binding_energy_and_decay() -> None:
+    # 1 u = 931.494 MeV
+    e_u = mass_energy_equivalence("1 u")
+    assert str(e_u.units) == "joule"
+    assert e_u.to("MeV").magnitude == pytest.approx(931.494, rel=1e-4)
+
+    # Carbon-14 half-life = 5730 years
+    lam_c14 = decay_constant("5730 year")
+    assert str(lam_c14.units) == "1 / second"
+    assert half_life_from_decay_constant(lam_c14).to("year").magnitude == pytest.approx(5730.0)
+
+    # After 2 half-lives (11460 years), 100 g decays to 25 g
+    rem = radioactive_remaining("100 g", "11460 year", half_life="5730 year")
+    assert str(rem.units) == "gram"
+    assert rem.magnitude == pytest.approx(25.0)
+    assert radioactive_remaining("100 g", "0 s", decay_constant=lam_c14).magnitude == pytest.approx(
+        100.0
+    )
+
+    # Activity in Bq and Ci
+    act = radioactive_activity(1e20, half_life="1000 s")
+    assert str(act.units) == "becquerel"
+    assert act.magnitude == pytest.approx(1e20 * math.log(2.0) / 1000.0)
+    assert act.to("Ci").magnitude == pytest.approx(act.magnitude / 3.7e10, rel=1e-6)
+
+    age = radiometric_age("100 g", "25 g", half_life="5730 year")
+    assert str(age.units) == "second"
+    assert age.to("year").magnitude == pytest.approx(11460.0)
+    assert radiometric_age("100 g", "100 g", half_life="5730 year").magnitude == 0.0
+
+
+def test_nuclear_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        mass_energy_equivalence("1 J")
+    with pytest.raises(pint.DimensionalityError):
+        decay_constant("10 m")
+    with pytest.raises(pint.DimensionalityError):
+        radiometric_age("100 g", "25 s", half_life="5730 year")
+
+    with pytest.raises(ValueError):
+        radioactive_remaining("100 g", "10 s")
+    with pytest.raises(ValueError):
+        radioactive_activity(1e10, half_life="10 s", decay_constant="0.1 / s")
+
+    with pytest.raises(PhysicalDomainError):
+        mass_energy_equivalence("-1 u")
+    with pytest.raises(PhysicalDomainError):
+        decay_constant("0 s")
+    with pytest.raises(PhysicalDomainError):
+        half_life_from_decay_constant("0 / s")
+    with pytest.raises(PhysicalDomainError):
+        radioactive_remaining("-10 g", "10 s", half_life="5 s")
+    with pytest.raises(PhysicalDomainError):
+        radioactive_remaining("10 g", "-1 s", half_life="5 s")
+    with pytest.raises(PhysicalDomainError):
+        radiometric_age("10 g", "20 g", half_life="5730 year")
+    with pytest.raises(PhysicalDomainError):
+        radiometric_age("10 g", "0 g", half_life="5730 year")

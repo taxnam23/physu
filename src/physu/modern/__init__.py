@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
-from . import atomic, photons, quantum, relativity
+from . import atomic, nuclear, photons, quantum, relativity
 from .atomic import (
     bohr_energy_level,
     bohr_orbit_radius,
     bohr_transition_energy,
     rydberg_wavelength,
+)
+from .nuclear import (
+    decay_constant,
+    half_life_from_decay_constant,
+    mass_energy_equivalence,
+    radioactive_activity,
+    radioactive_remaining,
+    radiometric_age,
 )
 from .photons import (
     compton_wavelength_shift,
@@ -45,12 +53,16 @@ __all__ = [
     "compton_wavelength_shift",
     "de_broglie_wavelength",
     "de_broglie_wavelength_particle",
+    "decay_constant",
     "energy_momentum_relation",
+    "half_life_from_decay_constant",
     "heisenberg_min_energy_uncertainty",
     "heisenberg_min_momentum_uncertainty",
     "infinite_well_energy",
     "length_contraction",
     "lorentz_factor",
+    "mass_energy_equivalence",
+    "nuclear",
     "photoelectric_max_kinetic_energy",
     "photoelectric_stopping_potential",
     "photoelectric_threshold_frequency",
@@ -58,6 +70,9 @@ __all__ = [
     "photon_momentum",
     "photons",
     "quantum",
+    "radioactive_activity",
+    "radioactive_remaining",
+    "radiometric_age",
     "relativistic_kinetic_energy",
     "relativistic_momentum",
     "relativistic_total_energy",

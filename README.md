@@ -98,6 +98,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `photons`: Photons, photoelectric effect, Compton scattering, and Wien's law (`photon_energy`, `photon_momentum`, `photoelectric_max_kinetic_energy`, `photoelectric_threshold_frequency`, `photoelectric_stopping_potential`, `compton_wavelength_shift`, `wien_peak_wavelength`)
   - `quantum`: Matter waves, Heisenberg bounds, and 1D infinite well (`de_broglie_wavelength`, `de_broglie_wavelength_particle`, `heisenberg_min_momentum_uncertainty`, `heisenberg_min_energy_uncertainty`, `infinite_well_energy`)
   - `atomic`: Bohr model and hydrogenic spectra (`bohr_orbit_radius`, `bohr_energy_level`, `bohr_transition_energy`, `rydberg_wavelength`)
+  - `nuclear`: Nuclear binding energy and radioactive decay (`mass_energy_equivalence`, `decay_constant`, `half_life_from_decay_constant`, `radioactive_remaining`, `radioactive_activity`, `radiometric_age`)
 
 ## Development
 
