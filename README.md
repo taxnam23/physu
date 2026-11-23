@@ -97,6 +97,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `relativity`: Special relativity (`lorentz_factor`, `time_dilation`, `length_contraction`, `relativistic_velocity_addition`, `rest_energy`, `relativistic_total_energy`, `relativistic_kinetic_energy`, `relativistic_momentum`, `energy_momentum_relation`)
   - `photons`: Photons, photoelectric effect, Compton scattering, and Wien's law (`photon_energy`, `photon_momentum`, `photoelectric_max_kinetic_energy`, `photoelectric_threshold_frequency`, `photoelectric_stopping_potential`, `compton_wavelength_shift`, `wien_peak_wavelength`)
   - `quantum`: Matter waves, Heisenberg bounds, and 1D infinite well (`de_broglie_wavelength`, `de_broglie_wavelength_particle`, `heisenberg_min_momentum_uncertainty`, `heisenberg_min_energy_uncertainty`, `infinite_well_energy`)
+  - `atomic`: Bohr model and hydrogenic spectra (`bohr_orbit_radius`, `bohr_energy_level`, `bohr_transition_energy`, `rydberg_wavelength`)
 
 ## Development
 

@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from . import photons, quantum, relativity
+from . import atomic, photons, quantum, relativity
+from .atomic import (
+    bohr_energy_level,
+    bohr_orbit_radius,
+    bohr_transition_energy,
+    rydberg_wavelength,
+)
 from .photons import (
     compton_wavelength_shift,
     photoelectric_max_kinetic_energy,
@@ -32,6 +38,10 @@ from .relativity import (
 )
 
 __all__ = [
+    "atomic",
+    "bohr_energy_level",
+    "bohr_orbit_radius",
+    "bohr_transition_energy",
     "compton_wavelength_shift",
     "de_broglie_wavelength",
     "de_broglie_wavelength_particle",
@@ -54,6 +64,7 @@ __all__ = [
     "relativistic_velocity_addition",
     "relativity",
     "rest_energy",
+    "rydberg_wavelength",
     "time_dilation",
     "wien_peak_wavelength",
 ]

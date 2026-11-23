@@ -9,13 +9,18 @@ import pytest
 
 from physu import PhysicalDomainError
 from physu.constants import (
+    BOHR_RADIUS,
     ELECTRON_MASS,
     PLANCK_CONSTANT,
     REDUCED_PLANCK_CONSTANT,
+    RYDBERG_CONSTANT,
     SPEED_OF_LIGHT,
     WIEN_DISPLACEMENT_CONSTANT,
 )
 from physu.modern import (
+    bohr_energy_level,
+    bohr_orbit_radius,
+    bohr_transition_energy,
     compton_wavelength_shift,
     de_broglie_wavelength,
     de_broglie_wavelength_particle,
@@ -35,6 +40,7 @@ from physu.modern import (
     relativistic_total_energy,
     relativistic_velocity_addition,
     rest_energy,
+    rydberg_wavelength,
     time_dilation,
     wien_peak_wavelength,
 )
@@ -241,3 +247,48 @@ def test_quantum_validation_errors() -> None:
         infinite_well_energy(1.5, ELECTRON_MASS, "1 nm")
     with pytest.raises(PhysicalDomainError):
         infinite_well_energy(1, ELECTRON_MASS, "0 nm")
+
+
+def test_atomic_bohr_and_rydberg() -> None:
+    a0 = float(BOHR_RADIUS.to("m").magnitude)
+    r_inf = float(RYDBERG_CONSTANT.to("1 / m").magnitude)
+
+    assert bohr_orbit_radius(1).magnitude == pytest.approx(a0)
+    assert bohr_orbit_radius(2, atomic_number=2).magnitude == pytest.approx(2.0 * a0)
+
+    e1 = bohr_energy_level(1)
+    assert str(e1.units) == "joule"
+    assert e1.to("eV").magnitude == pytest.approx(-13.605693, rel=1e-6)
+    assert bohr_energy_level(2, atomic_number=2).to("eV").magnitude == pytest.approx(
+        e1.to("eV").magnitude
+    )
+
+    # Balmer alpha emission n=3 -> n=2 (~ -1.89 eV, ~656.1 nm)
+    de_balmer = bohr_transition_energy(3, 2)
+    assert de_balmer.to("eV").magnitude == pytest.approx(
+        -13.605693 * (1.0 / 4.0 - 1.0 / 9.0), rel=1e-6
+    )
+    assert bohr_transition_energy(2, 2).magnitude == 0.0
+
+    lam_alpha = rydberg_wavelength(3, 2)
+    assert str(lam_alpha.units) == "meter"
+    assert lam_alpha.magnitude == pytest.approx(1.0 / (r_inf * (1.0 / 4.0 - 1.0 / 9.0)))
+    assert photon_energy(wavelength=lam_alpha).magnitude == pytest.approx(-de_balmer.magnitude)
+
+
+def test_atomic_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        bohr_orbit_radius(1, bohr_radius="1 s")
+    with pytest.raises(pint.DimensionalityError):
+        rydberg_wavelength(3, 2, rydberg_constant="1 m")
+
+    with pytest.raises(PhysicalDomainError):
+        bohr_orbit_radius(0)
+    with pytest.raises(PhysicalDomainError):
+        bohr_orbit_radius(1, atomic_number=0)
+    with pytest.raises(PhysicalDomainError):
+        bohr_energy_level(1.5)
+    with pytest.raises(PhysicalDomainError):
+        rydberg_wavelength(2, 2)
+    with pytest.raises(PhysicalDomainError):
+        rydberg_wavelength(3, 2, rydberg_constant="0 / m")
