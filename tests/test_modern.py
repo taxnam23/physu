@@ -11,12 +11,18 @@ from physu import PhysicalDomainError
 from physu.constants import (
     ELECTRON_MASS,
     PLANCK_CONSTANT,
+    REDUCED_PLANCK_CONSTANT,
     SPEED_OF_LIGHT,
     WIEN_DISPLACEMENT_CONSTANT,
 )
 from physu.modern import (
     compton_wavelength_shift,
+    de_broglie_wavelength,
+    de_broglie_wavelength_particle,
     energy_momentum_relation,
+    heisenberg_min_energy_uncertainty,
+    heisenberg_min_momentum_uncertainty,
+    infinite_well_energy,
     length_contraction,
     lorentz_factor,
     photoelectric_max_kinetic_energy,
@@ -176,3 +182,62 @@ def test_photons_validation_errors() -> None:
         wien_peak_wavelength("0 K")
     with pytest.raises(PhysicalDomainError):
         wien_peak_wavelength("-300 degC")
+
+
+def test_quantum_de_broglie_heisenberg_and_well() -> None:
+    h_val = float(PLANCK_CONSTANT.to("J * s").magnitude)
+    hbar_val = float(REDUCED_PLANCK_CONSTANT.to("J * s").magnitude)
+    m_e = float(ELECTRON_MASS.to("kg").magnitude)
+
+    lam_p = de_broglie_wavelength("1e-24 kg * m / s")
+    assert str(lam_p.units) == "meter"
+    assert lam_p.magnitude == pytest.approx(h_val / 1e-24)
+
+    # Non-relativistic vs relativistic electron at 0.6 c (gamma = 1.25)
+    lam_nr = de_broglie_wavelength_particle(ELECTRON_MASS, "0.6 c", relativistic=False)
+    lam_rel = de_broglie_wavelength_particle(ELECTRON_MASS, "0.6 c", relativistic=True)
+    assert lam_rel.magnitude == pytest.approx(lam_nr.magnitude / 1.25)
+
+    dp = heisenberg_min_momentum_uncertainty("1 angstrom")
+    assert str(dp.units) == "kilogram * meter / second"
+    assert dp.magnitude == pytest.approx(hbar_val / (2.0 * 1e-10))
+
+    de = heisenberg_min_energy_uncertainty("1 ns")
+    assert str(de.units) == "joule"
+    assert de.magnitude == pytest.approx(hbar_val / (2.0 * 1e-9))
+
+    e1 = infinite_well_energy(1, ELECTRON_MASS, "1 nm")
+    e3 = infinite_well_energy(3, ELECTRON_MASS, "1 nm")
+    assert str(e1.units) == "joule"
+    assert e1.magnitude == pytest.approx((h_val**2) / (8.0 * m_e * (1e-9**2)))
+    assert e3.magnitude == pytest.approx(9.0 * e1.magnitude)
+
+
+def test_quantum_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        de_broglie_wavelength("10 J")
+    with pytest.raises(pint.DimensionalityError):
+        heisenberg_min_momentum_uncertainty("1 s")
+    with pytest.raises(pint.DimensionalityError):
+        heisenberg_min_energy_uncertainty("1 m")
+    with pytest.raises(pint.DimensionalityError):
+        infinite_well_energy(1, ELECTRON_MASS, "1 s")
+
+    with pytest.raises(PhysicalDomainError):
+        de_broglie_wavelength("0 kg * m / s")
+    with pytest.raises(PhysicalDomainError):
+        de_broglie_wavelength_particle("0 kg", "1e5 m / s")
+    with pytest.raises(PhysicalDomainError):
+        de_broglie_wavelength_particle(ELECTRON_MASS, "0 m / s")
+    with pytest.raises(PhysicalDomainError):
+        de_broglie_wavelength_particle(ELECTRON_MASS, "1.0 c", relativistic=True)
+    with pytest.raises(PhysicalDomainError):
+        heisenberg_min_momentum_uncertainty("0 m")
+    with pytest.raises(PhysicalDomainError):
+        heisenberg_min_energy_uncertainty("-1 ns")
+    with pytest.raises(PhysicalDomainError):
+        infinite_well_energy(0, ELECTRON_MASS, "1 nm")
+    with pytest.raises(PhysicalDomainError):
+        infinite_well_energy(1.5, ELECTRON_MASS, "1 nm")
+    with pytest.raises(PhysicalDomainError):
+        infinite_well_energy(1, ELECTRON_MASS, "0 nm")
