@@ -8,17 +8,29 @@ import pint
 import pytest
 
 from physu import PhysicalDomainError
-from physu.constants import ELECTRON_MASS, SPEED_OF_LIGHT
+from physu.constants import (
+    ELECTRON_MASS,
+    PLANCK_CONSTANT,
+    SPEED_OF_LIGHT,
+    WIEN_DISPLACEMENT_CONSTANT,
+)
 from physu.modern import (
+    compton_wavelength_shift,
     energy_momentum_relation,
     length_contraction,
     lorentz_factor,
+    photoelectric_max_kinetic_energy,
+    photoelectric_stopping_potential,
+    photoelectric_threshold_frequency,
+    photon_energy,
+    photon_momentum,
     relativistic_kinetic_energy,
     relativistic_momentum,
     relativistic_total_energy,
     relativistic_velocity_addition,
     rest_energy,
     time_dilation,
+    wien_peak_wavelength,
 )
 
 
@@ -95,3 +107,72 @@ def test_relativity_validation_errors() -> None:
     with pytest.raises(PhysicalDomainError):
         lorentz_factor("0.5 m / s", speed_of_light="0 m / s")
     assert math.isclose(lorentz_factor("-0.6 c").magnitude, 1.25)
+
+
+def test_photons_photoelectric_compton_and_wien() -> None:
+    h_val = float(PLANCK_CONSTANT.to("J * s").magnitude)
+    c_val = float(SPEED_OF_LIGHT.to("m / s").magnitude)
+
+    e_uv = photon_energy(wavelength="200 nm")
+    assert str(e_uv.units) == "joule"
+    assert e_uv.to("eV").magnitude == pytest.approx((h_val * c_val / 200e-9) / 1.602176634e-19)
+
+    e_freq = photon_energy(frequency="500 THz")
+    p_freq = photon_momentum(frequency="500 THz")
+    assert str(p_freq.units) == "kilogram * meter / second"
+    assert p_freq.magnitude == pytest.approx(e_freq.magnitude / c_val)
+
+    # Potassium work function = 2.30 eV, incident 400 nm UV photon (~3.10 eV)
+    f_inc = c_val / 400e-9
+    k_max = photoelectric_max_kinetic_energy(f"{f_inc} Hz", "2.30 eV")
+    assert k_max.to("eV").magnitude == pytest.approx(
+        photon_energy(wavelength="400 nm").to("eV").magnitude - 2.30
+    )
+    v_stop = photoelectric_stopping_potential(k_max)
+    assert str(v_stop.units) == "volt"
+    assert v_stop.magnitude == pytest.approx(k_max.to("eV").magnitude)
+
+    f0 = photoelectric_threshold_frequency("2.30 eV")
+    assert str(f0.units) == "hertz"
+    assert photoelectric_max_kinetic_energy(f0, "2.30 eV").magnitude == 0.0
+
+    # Compton scattering at 90 deg => lambda_C ; 0 deg => 0 ; 180 deg => 2 * lambda_C
+    m_e = float(ELECTRON_MASS.to("kg").magnitude)
+    lam_c = h_val / (m_e * c_val)
+    assert compton_wavelength_shift("90 deg").magnitude == pytest.approx(lam_c)
+    assert compton_wavelength_shift("180 deg").magnitude == pytest.approx(2.0 * lam_c)
+    assert compton_wavelength_shift("0 deg").magnitude == 0.0
+
+    # Sun surface ~5778 K => peak ~501.5 nm
+    lam_sun = wien_peak_wavelength("5778 K")
+    b_val = float(WIEN_DISPLACEMENT_CONSTANT.to("m * K").magnitude)
+    assert lam_sun.to("nm").magnitude == pytest.approx((b_val / 5778.0) * 1e9)
+
+
+def test_photons_validation_errors() -> None:
+    with pytest.raises(pint.DimensionalityError):
+        photon_energy(wavelength="500 Hz")
+    with pytest.raises(pint.DimensionalityError):
+        photoelectric_threshold_frequency("2.3 V")
+    with pytest.raises(pint.DimensionalityError):
+        compton_wavelength_shift("90 m")
+    with pytest.raises(pint.DimensionalityError):
+        wien_peak_wavelength("300 m")
+
+    with pytest.raises(ValueError):
+        photon_energy()
+    with pytest.raises(ValueError):
+        photon_energy(frequency="500 THz", wavelength="600 nm")
+
+    with pytest.raises(PhysicalDomainError):
+        photon_energy(wavelength="0 nm")
+    with pytest.raises(PhysicalDomainError):
+        photoelectric_max_kinetic_energy("400 THz", "3.0 eV")
+    with pytest.raises(PhysicalDomainError):
+        photoelectric_stopping_potential("-1 eV")
+    with pytest.raises(PhysicalDomainError):
+        compton_wavelength_shift("90 deg", particle_mass="0 kg")
+    with pytest.raises(PhysicalDomainError):
+        wien_peak_wavelength("0 K")
+    with pytest.raises(PhysicalDomainError):
+        wien_peak_wavelength("-300 degC")

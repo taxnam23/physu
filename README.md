@@ -95,6 +95,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
   - `capillarity`: Surface tension, Young-Laplace pressure, and capillary rise (`surface_tension_force`, `laplace_bubble_pressure`, `capillary_rise_height`)
 - **`physu.modern`**:
   - `relativity`: Special relativity (`lorentz_factor`, `time_dilation`, `length_contraction`, `relativistic_velocity_addition`, `rest_energy`, `relativistic_total_energy`, `relativistic_kinetic_energy`, `relativistic_momentum`, `energy_momentum_relation`)
+  - `photons`: Photons, photoelectric effect, Compton scattering, and Wien's law (`photon_energy`, `photon_momentum`, `photoelectric_max_kinetic_energy`, `photoelectric_threshold_frequency`, `photoelectric_stopping_potential`, `compton_wavelength_shift`, `wien_peak_wavelength`)
 
 ## Development
 
