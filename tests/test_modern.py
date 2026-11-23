@@ -7,7 +7,7 @@ import math
 import pint
 import pytest
 
-from physu import PhysicalDomainError
+from physu import PhysicalDomainError, modern
 from physu.constants import (
     BOHR_RADIUS,
     ELECTRON_MASS,
@@ -358,3 +358,40 @@ def test_nuclear_validation_errors() -> None:
         radiometric_age("10 g", "20 g", half_life="5730 year")
     with pytest.raises(PhysicalDomainError):
         radiometric_age("10 g", "0 g", half_life="5730 year")
+
+
+def test_modern_units_external_registry_and_exports() -> None:
+    # Additional units: keV, GeV, amu, fm
+    e_proton = rest_energy("1 amu")
+    assert e_proton.to("GeV").magnitude == pytest.approx(0.931494, rel=1e-4)
+
+    e_keV = photon_energy(wavelength="1.23984 nm")
+    assert e_keV.to("keV").magnitude == pytest.approx(1.0, rel=1e-4)
+
+    lam_fm = de_broglie_wavelength("1e-18 kg * m / s")
+    assert lam_fm.to("fm").magnitude == pytest.approx(0.662607015, rel=1e-6)
+
+    # External Pint registry compatibility
+    ext_ureg = pint.UnitRegistry()
+    gamma_ext = lorentz_factor(ext_ureg.Quantity(0.6, "c"))
+    assert gamma_ext.magnitude == pytest.approx(1.25)
+
+    # Non-finite rejection
+    with pytest.raises(PhysicalDomainError):
+        lorentz_factor("nan m / s")
+    with pytest.raises(PhysicalDomainError):
+        photon_energy(wavelength="inf nm")
+    with pytest.raises(PhysicalDomainError):
+        mass_energy_equivalence("nan kg")
+
+    # Package __all__ completeness across all 5 submodules
+    for submodule in (
+        modern.relativity,
+        modern.photons,
+        modern.quantum,
+        modern.atomic,
+        modern.nuclear,
+    ):
+        for symbol in submodule.__all__:
+            assert symbol in modern.__all__
+            assert hasattr(modern, symbol)

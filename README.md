@@ -38,6 +38,7 @@ Runnable scripts covering every module and submodule live in [examples/](example
 - [waves.py](examples/waves.py) — vehicle suspension SHM, guitar harmonics, PA decibel level, ultrasound reflection, and supersonic Mach cone
 - [optics.py](examples/optics.py) — optical fiber TIR, projector lens, thin-film interference, spectrometer grating, and telescope Rayleigh limit
 - [fluids.py](examples/fluids.py) — ocean pressure, iceberg buoyancy, Venturi flow, Poiseuille/Stokes viscosity, and capillary meniscus
+- [modern.py](examples/modern.py) — cosmic muon time dilation, Cs photocell, quantum well, Balmer-alpha spectrum, and C-14 dating
 
 ## Modules
 
